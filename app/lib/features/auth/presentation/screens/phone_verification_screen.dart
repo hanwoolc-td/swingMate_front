@@ -8,9 +8,14 @@ import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.d
 import 'package:swingmate/features/auth/presentation/widgets/verification_code_input.dart';
 
 class PhoneVerificationScreen extends ConsumerStatefulWidget {
-  const PhoneVerificationScreen({required this.phoneNumber, super.key});
+  const PhoneVerificationScreen({
+    required this.phoneNumber,
+    this.isProSignup = false,
+    super.key,
+  });
 
   final String phoneNumber;
+  final bool isProSignup;
 
   @override
   ConsumerState<PhoneVerificationScreen> createState() =>
@@ -49,9 +54,10 @@ class _PhoneVerificationScreenState
   @override
   Widget build(BuildContext context) {
     final signupState = ref.watch(memberSignupViewModelProvider);
+    final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
 
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Center(
@@ -62,7 +68,12 @@ class _PhoneVerificationScreenState
                 OnboardingHeader(onBack: _goBack),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+                    padding: EdgeInsets.fromLTRB(
+                      24,
+                      40,
+                      24,
+                      24 + keyboardHeight,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -99,6 +110,7 @@ class _PhoneVerificationScreenState
                         VerificationCodeInput(
                           key: _verificationInputKey,
                           controller: _codeController,
+                          onCompleted: _hideKeyboard,
                         ),
                         const SizedBox(height: 12),
                         SizedBox(
@@ -158,13 +170,21 @@ class _PhoneVerificationScreenState
     return '$minutes:$seconds';
   }
 
+  void _hideKeyboard() {
+    FocusScope.of(context).unfocus();
+  }
+
   void _goBack() {
     if (context.canPop()) {
       context.pop();
       return;
     }
 
-    context.goNamed(AppRoutes.memberProfileName);
+    context.goNamed(
+      widget.isProSignup
+          ? AppRoutes.proProfileName
+          : AppRoutes.memberProfileName,
+    );
   }
 
   Future<void> _resendCode() async {
@@ -221,6 +241,10 @@ class _PhoneVerificationScreenState
       return;
     }
 
-    context.pushNamed(AppRoutes.lessonPreferencesName);
+    context.pushNamed(
+      widget.isProSignup
+          ? AppRoutes.proCareerName
+          : AppRoutes.lessonPreferencesName,
+    );
   }
 }

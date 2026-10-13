@@ -20,6 +20,8 @@ class MemberProfileScreen extends ConsumerStatefulWidget {
 class _MemberProfileScreenState extends ConsumerState<MemberProfileScreen> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _requestButtonFocusNode = FocusNode();
+  bool _phoneCompletionHandled = false;
 
   @override
   void initState() {
@@ -33,14 +35,17 @@ class _MemberProfileScreenState extends ConsumerState<MemberProfileScreen> {
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
+    _requestButtonFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final signupState = ref.watch(memberSignupViewModelProvider);
+    final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Center(
@@ -51,7 +56,12 @@ class _MemberProfileScreenState extends ConsumerState<MemberProfileScreen> {
                 OnboardingHeader(onBack: _goBack),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+                    padding: EdgeInsets.fromLTRB(
+                      24,
+                      40,
+                      24,
+                      24 + keyboardHeight,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -100,12 +110,14 @@ class _MemberProfileScreenState extends ConsumerState<MemberProfileScreen> {
                             FilteringTextInputFormatter.digitsOnly,
                           ],
                           maxLength: 11,
+                          onChanged: _handlePhoneChanged,
                         ),
                         const SizedBox(height: 80),
                         SizedBox(
                           width: double.infinity,
                           height: 48,
                           child: FilledButton(
+                            focusNode: _requestButtonFocusNode,
                             onPressed: signupState.isSendingVerificationCode
                                 ? null
                                 : () {
@@ -159,6 +171,20 @@ class _MemberProfileScreenState extends ConsumerState<MemberProfileScreen> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('프로필 사진 등록은 다음 단계에서 연결합니다.')));
+  }
+
+  void _handlePhoneChanged(String phoneNumber) {
+    if (phoneNumber.length < 11) {
+      _phoneCompletionHandled = false;
+      return;
+    }
+    if (_phoneCompletionHandled) return;
+
+    _phoneCompletionHandled = true;
+    FocusScope.of(context).unfocus();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _requestButtonFocusNode.requestFocus();
+    });
   }
 
   Future<void> _requestVerificationCode() async {

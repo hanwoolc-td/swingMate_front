@@ -33,6 +33,7 @@ abstract final class AppColors {
   static const border = Color(0xFFE5E6E9);
   static const borderSubtle = Color(0x80E5E6E9);
   static const controlBorder = Color(0xFFC5C5C5);
+  static const dashedBorder = Color(0xFFADB0B7);
 
   static const lessonStatusBackground = Color(0xFFCEF2D0);
   static const lessonStatusForeground = Color(0xFF17461A);

@@ -8,6 +8,9 @@ import 'package:swingmate/features/auth/presentation/screens/pro_code_connection
 import 'package:swingmate/features/auth/presentation/screens/pro_connection_success_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/pro_connection_failure_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/role_selection_screen.dart';
+import 'package:swingmate/features/auth/presentation/screens/pro_profile_screen.dart';
+import 'package:swingmate/features/auth/presentation/screens/pro_career_screen.dart';
+import 'package:swingmate/features/auth/presentation/screens/pro_availability_screen.dart';
 import 'package:swingmate/features/home/presentation/screens/home_screen.dart';
 import 'package:swingmate/features/notification/presentation/screens/notification_screen.dart';
 import 'package:swingmate/features/setup/presentation/setup_page.dart';
@@ -29,6 +32,21 @@ abstract final class AppRouteDefinitions {
       builder: (context, state) => const RoleSelectionScreen(),
     ),
     GoRoute(
+      path: AppRoutes.proProfilePath,
+      name: AppRoutes.proProfileName,
+      builder: (context, state) => const ProProfileScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.proCareerPath,
+      name: AppRoutes.proCareerName,
+      builder: (context, state) => const ProCareerScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.proAvailabilityPath,
+      name: AppRoutes.proAvailabilityName,
+      builder: (context, state) => const ProAvailabilityScreen(),
+    ),
+    GoRoute(
       path: AppRoutes.memberProfilePath,
       name: AppRoutes.memberProfileName,
       builder: (context, state) => const MemberProfileScreen(),
@@ -38,6 +56,7 @@ abstract final class AppRouteDefinitions {
       name: AppRoutes.phoneVerificationName,
       builder: (context, state) => PhoneVerificationScreen(
         phoneNumber: state.extra as String? ?? '010-1234-5678',
+        isProSignup: state.uri.queryParameters['role'] == 'pro',
       ),
     ),
     GoRoute(

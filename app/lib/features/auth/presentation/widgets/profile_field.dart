@@ -12,6 +12,8 @@ class ProfileField extends StatelessWidget {
     this.keyboardType,
     this.inputFormatters,
     this.maxLength,
+    this.fillColor = AppColors.inputBackground,
+    this.onChanged,
     super.key,
   });
 
@@ -21,6 +23,8 @@ class ProfileField extends StatelessWidget {
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final int? maxLength;
+  final Color fillColor;
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +49,8 @@ class ProfileField extends StatelessWidget {
         const SizedBox(height: 16),
         TextField(
           controller: controller,
+          onChanged: onChanged,
+          onTap: () => _scrollToBottom(context),
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
           maxLength: maxLength,
@@ -57,7 +63,7 @@ class ProfileField extends StatelessWidget {
               fontSize: 16,
             ),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: fillColor,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -75,5 +81,18 @@ class ProfileField extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void _scrollToBottom(BuildContext context) {
+    Future<void>.delayed(const Duration(milliseconds: 300), () {
+      if (!context.mounted) return;
+      final scrollable = Scrollable.maybeOf(context);
+      if (scrollable == null) return;
+      scrollable.position.animateTo(
+        scrollable.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+    });
   }
 }

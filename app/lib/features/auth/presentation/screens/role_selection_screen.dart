@@ -81,7 +81,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                               width: double.infinity,
                               height: 48,
                               child: FilledButton(
-                                onPressed: () => _showComingSoon(context),
+                                onPressed: _continue,
                                 style: FilledButton.styleFrom(
                                   backgroundColor: AppColors.action,
                                   foregroundColor: AppColors.surface,
@@ -125,14 +125,12 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
     context.goNamed(AppRoutes.loginName);
   }
 
-  void _showComingSoon(BuildContext context) {
+  void _continue() {
     if (_isMember) {
       context.pushNamed(AppRoutes.memberProfileName);
       return;
     }
 
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('프로 가입 화면은 다음 단계에서 연결합니다.')));
+    context.pushNamed(AppRoutes.proProfileName);
   }
 }

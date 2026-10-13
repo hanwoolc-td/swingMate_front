@@ -23,6 +23,8 @@ abstract final class AppAssets {
   static const requiredAsterisk = 'assets/icons/required_asterisk.svg';
 
   static const add = 'assets/icons/add.svg';
+  static const careerAdd = 'assets/icons/career_add.svg';
+  static const scheduleRemove = 'assets/icons/schedule_remove.svg';
   static const arrowRight = 'assets/icons/arrow_right.svg';
   static const assignment = 'assets/icons/assignment.svg';
   static const checkbook = 'assets/icons/checkbook.svg';

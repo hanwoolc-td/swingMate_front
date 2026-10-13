@@ -8,6 +8,15 @@ abstract final class AppRoutes {
   static const roleSelectionPath = '/onboarding/role';
   static const roleSelectionName = 'role-selection';
 
+  static const proProfilePath = '/onboarding/pro-profile';
+  static const proProfileName = 'pro-profile';
+
+  static const proCareerPath = '/onboarding/pro-career';
+  static const proCareerName = 'pro-career';
+
+  static const proAvailabilityPath = '/onboarding/pro-availability';
+  static const proAvailabilityName = 'pro-availability';
+
   static const memberProfilePath = '/onboarding/member-profile';
   static const memberProfileName = 'member-profile';
 

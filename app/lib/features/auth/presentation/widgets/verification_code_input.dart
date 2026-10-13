@@ -3,9 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
 
 class VerificationCodeInput extends StatefulWidget {
-  const VerificationCodeInput({required this.controller, super.key});
+  const VerificationCodeInput({
+    required this.controller,
+    this.onCompleted,
+    super.key,
+  });
 
   final TextEditingController controller;
+  final VoidCallback? onCompleted;
 
   @override
   State<VerificationCodeInput> createState() => _VerificationCodeInputState();
@@ -107,5 +112,9 @@ class _VerificationCodeInputState extends State<VerificationCodeInput> {
       text: code,
       selection: TextSelection.collapsed(offset: code.length),
     );
+
+    if (_digitControllers.every((controller) => controller.text.isNotEmpty)) {
+      widget.onCompleted?.call();
+    }
   }
 }
