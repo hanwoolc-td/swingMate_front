@@ -60,6 +60,36 @@ void main() {
       expect(viewModel.validateProAvailability(), isNull);
     });
 
+    test(
+      'keeps common profile data and clears role-specific data on role change',
+      () {
+        final container = _createContainer(_FakeAuthRepository());
+        addTearDown(container.dispose);
+        final viewModel = container.read(signupFlowViewModelProvider.notifier);
+
+        viewModel
+          ..selectRole(SignupRole.member)
+          ..updateName('홍길동')
+          ..updatePhoneNumber('01012345678')
+          ..toggleInterest('드라이버')
+          ..selectRole(SignupRole.pro);
+
+        var state = container.read(signupFlowViewModelProvider);
+        expect(state.name, '홍길동');
+        expect(state.phoneNumber, '01012345678');
+        expect(state.member, const MemberSignupDraft());
+
+        viewModel
+          ..updateProIntroduction('KPGA 프로입니다.')
+          ..selectRole(SignupRole.member);
+
+        state = container.read(signupFlowViewModelProvider);
+        expect(state.name, '홍길동');
+        expect(state.phoneNumber, '01012345678');
+        expect(state.pro, const ProSignupDraft());
+      },
+    );
+
     test('blocks duplicate verification-code requests', () async {
       final repository = _FakeAuthRepository(
         sendCompleter: Completer<VerificationCodeDelivery>(),

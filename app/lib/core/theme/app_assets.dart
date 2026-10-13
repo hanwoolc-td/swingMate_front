@@ -24,6 +24,7 @@ abstract final class AppAssets {
 
   static const add = 'assets/icons/add.svg';
   static const careerAdd = 'assets/icons/career_add.svg';
+  static const keyboardArrowDown = 'assets/icons/keyboard_arrow_down.svg';
   static const scheduleRemove = 'assets/icons/schedule_remove.svg';
   static const arrowRight = 'assets/icons/arrow_right.svg';
   static const assignment = 'assets/icons/assignment.svg';

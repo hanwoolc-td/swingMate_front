@@ -80,7 +80,7 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
                         ),
                         const SizedBox(height: 6),
                         const Text(
-                          '여기에 뭐라고 적으면 좋을까?',
+                          '프로필 사진과 기본 정보를 입력해 주세요.',
                           style: TextStyle(
                             color: AppColors.secondaryText,
                             fontSize: 18,
@@ -104,6 +104,9 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
                           controller: _nameController,
                           hintText: '예) 홍길동',
                           fillColor: AppColors.roleCardBackground,
+                          onChanged: ref
+                              .read(signupFlowViewModelProvider.notifier)
+                              .updateName,
                         ),
                         const SizedBox(height: 32),
                         ProfileField(
@@ -181,6 +184,10 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
   }
 
   void _handlePhoneChanged(String phoneNumber) {
+    ref
+        .read(signupFlowViewModelProvider.notifier)
+        .updatePhoneNumber(phoneNumber);
+
     if (phoneNumber.length < 11) {
       _phoneCompletionHandled = false;
       return;

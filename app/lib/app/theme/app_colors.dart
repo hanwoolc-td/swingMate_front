@@ -40,6 +40,7 @@ abstract final class AppColors {
   static const lessonPassIconBackground = Color(0xFFE5E6E9);
 
   static const shadow = Color(0x14000000);
+  static const cardShadow = Color(0x05000000);
 
   static const kakao = Color(0xFFFEE500);
   static const kakaoForeground = Color(0xFF3C1E1E);

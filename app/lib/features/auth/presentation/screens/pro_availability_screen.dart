@@ -11,6 +11,7 @@ import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart'
 import 'package:swingmate/features/auth/presentation/helpers/signup_messages.dart';
 import 'package:swingmate/features/auth/presentation/states/signup_flow_state.dart';
 import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.dart';
+import 'package:swingmate/features/auth/presentation/widgets/time_picker_bottom_sheet.dart';
 
 class ProAvailabilityScreen extends ConsumerStatefulWidget {
   const ProAvailabilityScreen({super.key});
@@ -26,6 +27,7 @@ class _ProAvailabilityScreenState extends ConsumerState<ProAvailabilityScreen> {
   final _sharedRanges = <_TimeRange>[];
   late final Map<String, List<_TimeRange>> _dayRanges;
   bool _isDaySpecific = false;
+  String? _expandedDay;
 
   @override
   void initState() {
@@ -40,6 +42,7 @@ class _ProAvailabilityScreenState extends ConsumerState<ProAvailabilityScreen> {
             .toList(),
     };
     _isDaySpecific = draft.isDaySpecific;
+    _expandedDay = null;
   }
 
   @override
@@ -104,6 +107,8 @@ class _ProAvailabilityScreenState extends ConsumerState<ProAvailabilityScreen> {
                             onAddRange: _addDayRange,
                             onRemoveRange: _removeDayRange,
                             onRangeChanged: _syncAvailabilityState,
+                            expandedDay: _expandedDay,
+                            onToggleDay: _toggleExpandedDay,
                           )
                         else
                           _SharedSchedule(
@@ -122,7 +127,9 @@ class _ProAvailabilityScreenState extends ConsumerState<ProAvailabilityScreen> {
                               textStyle: const TextStyle(fontSize: 14),
                             ),
                             child: Text(
-                              _isDaySpecific ? '한 번에 설정하기' : '요일별로 다르게 설정하기',
+                              _isDaySpecific
+                                  ? '모든 요일에 같은 시간 적용하기'
+                                  : '요일별로 다르게 설정하기',
                             ),
                           ),
                         ),
@@ -150,7 +157,7 @@ class _ProAvailabilityScreenState extends ConsumerState<ProAvailabilityScreen> {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      child: const Text('완료'),
+                      child: const Text('다음'),
                     ),
                   ),
                 ),
@@ -166,6 +173,9 @@ class _ProAvailabilityScreenState extends ConsumerState<ProAvailabilityScreen> {
     setState(() {
       if (!_selectedDays.add(day)) {
         _selectedDays.remove(day);
+        if (_expandedDay == day) {
+          _expandedDay = null;
+        }
       }
     });
     _syncAvailabilityState();
@@ -201,8 +211,15 @@ class _ProAvailabilityScreenState extends ConsumerState<ProAvailabilityScreen> {
   }
 
   void _toggleScheduleMode() {
-    setState(() => _isDaySpecific = !_isDaySpecific);
+    setState(() {
+      _isDaySpecific = !_isDaySpecific;
+      _expandedDay = null;
+    });
     _syncAvailabilityState();
+  }
+
+  void _toggleExpandedDay(String day) {
+    setState(() => _expandedDay = _expandedDay == day ? null : day);
   }
 
   void _syncAvailabilityState() {
@@ -336,7 +353,6 @@ class _SharedSchedule extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
               '레슨 가능 시간',
@@ -346,11 +362,17 @@ class _SharedSchedule extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            Text(
-              selectedDayLabel,
-              style: const TextStyle(
-                color: AppColors.secondaryText,
-                fontSize: 14,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                selectedDayLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.right,
+                style: const TextStyle(
+                  color: AppColors.secondaryText,
+                  fontSize: 14,
+                ),
               ),
             ),
           ],
@@ -379,6 +401,8 @@ class _DaySpecificSchedule extends StatelessWidget {
     required this.onAddRange,
     required this.onRemoveRange,
     required this.onRangeChanged,
+    required this.expandedDay,
+    required this.onToggleDay,
   });
 
   final Set<String> selectedDays;
@@ -386,6 +410,8 @@ class _DaySpecificSchedule extends StatelessWidget {
   final ValueChanged<String> onAddRange;
   final void Function(String, _TimeRange) onRemoveRange;
   final VoidCallback onRangeChanged;
+  final String? expandedDay;
+  final ValueChanged<String> onToggleDay;
 
   @override
   Widget build(BuildContext context) {
@@ -415,11 +441,13 @@ class _DaySpecificSchedule extends StatelessWidget {
           _DayScheduleCard(
             dayName: weekdayNames[day]!,
             ranges: ranges[day]!,
+            isExpanded: expandedDay == day,
+            onToggle: () => onToggleDay(day),
             onAddRange: () => onAddRange(day),
             onRemoveRange: (range) => onRemoveRange(day, range),
             onRangeChanged: onRangeChanged,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
         ],
       ],
     );
@@ -430,6 +458,8 @@ class _DayScheduleCard extends StatelessWidget {
   const _DayScheduleCard({
     required this.dayName,
     required this.ranges,
+    required this.isExpanded,
+    required this.onToggle,
     required this.onAddRange,
     required this.onRemoveRange,
     required this.onRangeChanged,
@@ -437,49 +467,95 @@ class _DayScheduleCard extends StatelessWidget {
 
   final String dayName;
   final List<_TimeRange> ranges;
+  final bool isExpanded;
+  final VoidCallback onToggle;
   final VoidCallback onAddRange;
   final ValueChanged<_TimeRange> onRemoveRange;
   final VoidCallback onRangeChanged;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        color: AppColors.surface,
         border: Border.all(color: AppColors.border),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.cardShadow,
+            offset: Offset(0, 2),
+            blurRadius: 2,
+          ),
+        ],
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            dayName,
-            style: const TextStyle(
-              color: AppColors.ink,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const _TimeLabels(fontSize: 12, compact: true),
-                const SizedBox(height: 8),
-                for (final range in ranges) ...[
-                  _TimeRangeRow(
-                    range: range,
-                    compact: true,
-                    onRemove: () => onRemoveRange(range),
-                    onChanged: onRangeChanged,
+          Semantics(
+            button: true,
+            expanded: isExpanded,
+            child: InkWell(
+              onTap: onToggle,
+              borderRadius: BorderRadius.circular(8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    dayName,
+                    style: const TextStyle(
+                      color: AppColors.ink,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      height: 18 / 14,
+                    ),
                   ),
-                  const SizedBox(height: 8),
+                  const Spacer(),
+                  if (!isExpanded)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        for (final range in ranges)
+                          if (range.startController.text.isNotEmpty &&
+                              range.endController.text.isNotEmpty)
+                            Text(
+                              '${range.startController.text} ~ ${range.endController.text}',
+                              style: const TextStyle(
+                                color: AppColors.secondaryText,
+                                fontSize: 14,
+                              ),
+                            ),
+                      ],
+                    ),
+                  const SizedBox(width: 12),
+                  SvgPicture.asset(AppAssets.keyboardArrowDown),
                 ],
-                _DashedAddButton(height: 30, compact: true, onTap: onAddRange),
-              ],
+              ),
             ),
           ),
+          if (isExpanded) ...[
+            const SizedBox(height: 16),
+            const _TimeLabels(fontSize: 12),
+            const SizedBox(height: 8),
+            for (final range in ranges) ...[
+              _TimeRangeRow(
+                range: range,
+                compact: true,
+                onRemove: () => onRemoveRange(range),
+                onChanged: onRangeChanged,
+              ),
+              const SizedBox(height: 8),
+            ],
+            Padding(
+              padding: const EdgeInsets.only(right: 36),
+              child: _DashedAddButton(
+                height: 30,
+                compact: true,
+                onTap: onAddRange,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -487,16 +563,14 @@ class _DayScheduleCard extends StatelessWidget {
 }
 
 class _TimeLabels extends StatelessWidget {
-  const _TimeLabels({required this.fontSize, this.compact = false});
+  const _TimeLabels({required this.fontSize});
   final double fontSize;
-  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        SizedBox(
-          width: compact ? 94.86 : 141.36,
+        Expanded(
           child: Text(
             '시작 시간',
             style: TextStyle(
@@ -506,8 +580,7 @@ class _TimeLabels extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 26),
-        SizedBox(
-          width: compact ? 94.86 : 141.36,
+        Expanded(
           child: Text(
             '종료 시간',
             style: TextStyle(
@@ -516,6 +589,7 @@ class _TimeLabels extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(width: 36),
       ],
     );
   }
@@ -639,8 +713,8 @@ class _TimeInput extends StatelessWidget {
   }
 
   Future<void> _selectTime(BuildContext context) async {
-    final selectedTime = await showTimePicker(
-      context: context,
+    final selectedTime = await showTimePickerBottomSheet(
+      context,
       initialTime: _parseTime(controller.text),
     );
 
@@ -682,7 +756,7 @@ class _DashedAddButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: compact ? 216 : 309,
+      width: compact ? double.infinity : 309,
       height: height,
       child: Semantics(
         button: true,

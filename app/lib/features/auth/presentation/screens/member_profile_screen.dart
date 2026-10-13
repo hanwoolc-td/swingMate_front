@@ -103,6 +103,9 @@ class _MemberProfileScreenState extends ConsumerState<MemberProfileScreen> {
                           label: '이름',
                           controller: _nameController,
                           hintText: '예) 홍길동',
+                          onChanged: ref
+                              .read(signupFlowViewModelProvider.notifier)
+                              .updateName,
                         ),
                         const SizedBox(height: 32),
                         ProfileField(
@@ -180,6 +183,10 @@ class _MemberProfileScreenState extends ConsumerState<MemberProfileScreen> {
   }
 
   void _handlePhoneChanged(String phoneNumber) {
+    ref
+        .read(signupFlowViewModelProvider.notifier)
+        .updatePhoneNumber(phoneNumber);
+
     if (phoneNumber.length < 11) {
       _phoneCompletionHandled = false;
       return;

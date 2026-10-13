@@ -68,7 +68,7 @@ class _ProCareerScreenState extends ConsumerState<ProCareerScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          '자신의 경력을\n소개해보세요.',
+                          '회원들에게 자신을\n소개해보세요.',
                           style: TextStyle(
                             color: AppColors.ink,
                             fontSize: 24,
@@ -78,7 +78,7 @@ class _ProCareerScreenState extends ConsumerState<ProCareerScreen> {
                         ),
                         const SizedBox(height: 8),
                         const Text(
-                          '프로가 레슨할때 참고할 정보예요.',
+                          '자신의 경력을 소개해보세요.',
                           style: TextStyle(
                             color: AppColors.secondaryText,
                             fontSize: 18,

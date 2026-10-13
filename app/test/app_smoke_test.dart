@@ -76,7 +76,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(ProProfileScreen), findsOneWidget);
     expect(find.text('회원들에게 자신을\n소개해보세요.'), findsOneWidget);
-    expect(find.text('여기에 뭐라고 적으면 좋을까?'), findsOneWidget);
+    expect(find.text('프로필 사진과 기본 정보를 입력해 주세요.'), findsOneWidget);
     expect(find.text('프로필 사진'), findsOneWidget);
     expect(find.text('인증번호 받기'), findsOneWidget);
 
@@ -117,18 +117,34 @@ void main() {
     expect(find.text('홈'), findsOneWidget);
   });
 
+  testWidgets('프로 경력 화면의 안내 문구를 표시한다', (tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SwingMateApp()));
+    await tester.pumpAndSettle();
+
+    final context = tester.element(find.byType(SwingMateApp));
+    ProviderScope.containerOf(context)
+        .read(appRouterProvider)
+        .goNamed(AppRoutes.proCareerName);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ProCareerScreen), findsOneWidget);
+    expect(find.text('회원들에게 자신을\n소개해보세요.'), findsOneWidget);
+    expect(find.text('자신의 경력을 소개해보세요.'), findsOneWidget);
+  });
+
   testWidgets('프로 경력 소개 화면을 표시하고 경력을 추가한다', (tester) async {
     await tester.pumpWidget(const ProviderScope(child: SwingMateApp()));
     await tester.pumpAndSettle();
 
     final context = tester.element(find.byType(SwingMateApp));
-    ProviderScope.containerOf(context).read(appRouterProvider).goNamed(
-      AppRoutes.proCareerName,
-    );
+    ProviderScope.containerOf(context)
+        .read(appRouterProvider)
+        .goNamed(AppRoutes.proCareerName);
     await tester.pumpAndSettle();
 
     expect(find.byType(ProCareerScreen), findsOneWidget);
-    expect(find.text('자신의 경력을\n소개해보세요.'), findsOneWidget);
+    expect(find.text('회원들에게 자신을\n소개해보세요.'), findsOneWidget);
+    expect(find.text('자신의 경력을 소개해보세요.'), findsOneWidget);
     expect(find.text('간단한 자기소개를 입력해주세요.\n(최대 200자)'), findsOneWidget);
     expect(find.text('경력 추가'), findsOneWidget);
 
@@ -137,7 +153,9 @@ void main() {
     expect(find.text('프로 소개를 입력해주세요.'), findsOneWidget);
     expect(find.text('경력을 하나 이상 입력해주세요.'), findsOneWidget);
 
-    await tester.tap(find.text('경력 추가'));
+    final addCareerButton = find.text('경력 추가');
+    await tester.ensureVisible(addCareerButton);
+    await tester.tap(addCareerButton);
     await tester.pumpAndSettle();
     expect(find.byType(TextField), findsNWidgets(3));
 
@@ -148,27 +166,27 @@ void main() {
     expect(find.byType(ProAvailabilityScreen), findsOneWidget);
   });
 
-  testWidgets('프로 소개 화면에서 정보를 입력하고 인증 화면으로 이동한다', (
-    tester,
-  ) async {
+  testWidgets('프로 소개 화면에서 정보를 입력하고 인증 화면으로 이동한다', (tester) async {
     await tester.pumpWidget(const ProviderScope(child: SwingMateApp()));
     await tester.pumpAndSettle();
 
     final context = tester.element(find.byType(SwingMateApp));
-    ProviderScope.containerOf(context).read(appRouterProvider).goNamed(
-      AppRoutes.proProfileName,
-    );
+    ProviderScope.containerOf(context)
+        .read(appRouterProvider)
+        .goNamed(AppRoutes.proProfileName);
     await tester.pumpAndSettle();
 
     expect(find.byType(ProProfileScreen), findsOneWidget);
     expect(find.text('회원들에게 자신을\n소개해보세요.'), findsOneWidget);
-    expect(find.text('여기에 뭐라고 적으면 좋을까?'), findsOneWidget);
+    expect(find.text('프로필 사진과 기본 정보를 입력해 주세요.'), findsOneWidget);
     expect(find.bySemanticsLabel('프로필 사진 추가'), findsOneWidget);
 
     final fields = find.byType(TextField);
     expect(fields, findsNWidgets(2));
-    expect(tester.widget<TextField>(fields.at(1)).keyboardType,
-        TextInputType.phone);
+    expect(
+      tester.widget<TextField>(fields.at(1)).keyboardType,
+      TextInputType.phone,
+    );
 
     await tester.enterText(fields.at(0), '홍길동');
     await tester.enterText(fields.at(1), '01012345678');
@@ -177,18 +195,41 @@ void main() {
     await tester.pump();
 
     expect(find.byType(PhoneVerificationScreen), findsOneWidget);
+    expect(find.text('010-1234-5678로 인증번호를 보냈습니다.'), findsOneWidget);
   });
 
-  testWidgets('프로 예약 가능 시간의 공통 및 요일별 설정 형식을 전환한다', (
-    tester,
-  ) async {
+  testWidgets('회원 프로필 입력은 역할 선택 화면에 다녀와도 유지된다', (tester) async {
     await tester.pumpWidget(const ProviderScope(child: SwingMateApp()));
     await tester.pumpAndSettle();
 
     final context = tester.element(find.byType(SwingMateApp));
-    ProviderScope.containerOf(context).read(appRouterProvider).goNamed(
-      AppRoutes.proAvailabilityName,
-    );
+    ProviderScope.containerOf(context)
+        .read(appRouterProvider)
+        .goNamed(AppRoutes.memberProfileName);
+    await tester.pumpAndSettle();
+
+    final fields = find.byType(TextField);
+    await tester.enterText(fields.at(0), '홍길동');
+    await tester.enterText(fields.at(1), '01012345678');
+
+    await tester.tap(find.bySemanticsLabel('뒤로 가기'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MemberProfileScreen), findsOneWidget);
+    expect(find.text('홍길동'), findsOneWidget);
+    expect(find.text('01012345678'), findsOneWidget);
+  });
+
+  testWidgets('프로 예약 가능 시간의 공통 및 요일별 설정 형식을 전환한다', (tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SwingMateApp()));
+    await tester.pumpAndSettle();
+
+    final context = tester.element(find.byType(SwingMateApp));
+    ProviderScope.containerOf(context)
+        .read(appRouterProvider)
+        .goNamed(AppRoutes.proAvailabilityName);
     await tester.pumpAndSettle();
 
     expect(find.byType(ProAvailabilityScreen), findsOneWidget);
@@ -197,12 +238,24 @@ void main() {
     expect(find.text('09:00'), findsOneWidget);
     expect(find.text('13:00'), findsOneWidget);
 
-    await tester.tap(find.text('요일별로 다르게 설정하기'));
+    final daySpecificButton = find.text('요일별로 다르게 설정하기');
+    await tester.ensureVisible(daySpecificButton);
+    await tester.tap(daySpecificButton);
     await tester.pumpAndSettle();
 
-    expect(find.text('한 번에 설정하기'), findsOneWidget);
+    expect(find.text('모든 요일에 같은 시간 적용하기'), findsOneWidget);
     expect(find.text('월요일'), findsOneWidget);
     expect(find.text('화요일'), findsOneWidget);
+    expect(find.text('수요일'), findsOneWidget);
+    expect(find.text('시작 시간'), findsNothing);
+    expect(find.text('종료 시간'), findsNothing);
+
+    final wednesdayCard = find.text('수요일');
+    await tester.ensureVisible(wednesdayCard);
+    await tester.tap(wednesdayCard);
+    await tester.pumpAndSettle();
+    expect(find.text('시작 시간'), findsOneWidget);
+    expect(find.text('종료 시간'), findsOneWidget);
   });
 
   testWidgets('빈 홈 상태를 표시한다', (tester) async {

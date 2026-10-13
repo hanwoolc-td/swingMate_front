@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
 import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
+import 'package:swingmate/features/auth/presentation/helpers/phone_number_formatter.dart';
 import 'package:swingmate/features/auth/presentation/helpers/signup_messages.dart';
 import 'package:swingmate/features/auth/presentation/states/signup_flow_state.dart';
 import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.dart';
@@ -84,7 +85,7 @@ class _PhoneVerificationScreenState
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '${signupState.phoneNumber}로 인증번호를 보냈습니다.',
+                          '${formatKoreanPhoneNumber(signupState.phoneNumber)}로 인증번호를 보냈습니다.',
                           style: const TextStyle(
                             color: AppColors.secondaryText,
                             fontSize: 18,
