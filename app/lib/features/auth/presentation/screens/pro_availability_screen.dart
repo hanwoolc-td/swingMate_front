@@ -1,32 +1,46 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
 import 'package:swingmate/core/theme/app_assets.dart';
+import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
+import 'package:swingmate/features/auth/presentation/helpers/signup_messages.dart';
+import 'package:swingmate/features/auth/presentation/states/signup_flow_state.dart';
 import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.dart';
 
-class ProAvailabilityScreen extends StatefulWidget {
+class ProAvailabilityScreen extends ConsumerStatefulWidget {
   const ProAvailabilityScreen({super.key});
 
   @override
-  State<ProAvailabilityScreen> createState() => _ProAvailabilityScreenState();
+  ConsumerState<ProAvailabilityScreen> createState() =>
+      _ProAvailabilityScreenState();
 }
 
-class _ProAvailabilityScreenState extends State<ProAvailabilityScreen> {
+class _ProAvailabilityScreenState extends ConsumerState<ProAvailabilityScreen> {
   static const _weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-  final _selectedDays = <String>{'월', '화', '수', '목', '금'};
-  final _sharedRanges = <_TimeRange>[
-    _TimeRange(start: '09:00', end: '13:00'),
-    _TimeRange(start: '18:00', end: '22:00'),
-  ];
-  late final Map<String, List<_TimeRange>> _dayRanges = {
-    for (final day in _weekdays)
-      day: [_TimeRange(start: '09:00', end: '18:00')],
-  };
+  final _selectedDays = <String>{};
+  final _sharedRanges = <_TimeRange>[];
+  late final Map<String, List<_TimeRange>> _dayRanges;
   bool _isDaySpecific = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final draft = ref.read(signupFlowViewModelProvider).pro;
+    _selectedDays.addAll(draft.selectedDays);
+    _sharedRanges.addAll(draft.sharedRanges.map(_TimeRange.fromValue));
+    _dayRanges = {
+      for (final day in _weekdays)
+        day: (draft.dayRanges[day] ?? const <LessonTimeRangeInput>[])
+            .map(_TimeRange.fromValue)
+            .toList(),
+    };
+    _isDaySpecific = draft.isDaySpecific;
+  }
 
   @override
   void dispose() {
@@ -89,6 +103,7 @@ class _ProAvailabilityScreenState extends State<ProAvailabilityScreen> {
                             ranges: _dayRanges,
                             onAddRange: _addDayRange,
                             onRemoveRange: _removeDayRange,
+                            onRangeChanged: _syncAvailabilityState,
                           )
                         else
                           _SharedSchedule(
@@ -96,21 +111,18 @@ class _ProAvailabilityScreenState extends State<ProAvailabilityScreen> {
                             ranges: _sharedRanges,
                             onAddRange: _addSharedRange,
                             onRemoveRange: _removeSharedRange,
+                            onRangeChanged: _syncAvailabilityState,
                           ),
                         const SizedBox(height: 16),
                         Center(
                           child: TextButton(
-                            onPressed: () => setState(
-                              () => _isDaySpecific = !_isDaySpecific,
-                            ),
+                            onPressed: _toggleScheduleMode,
                             style: TextButton.styleFrom(
                               foregroundColor: AppColors.secondaryText,
                               textStyle: const TextStyle(fontSize: 14),
                             ),
                             child: Text(
-                              _isDaySpecific
-                                  ? '한 번에 설정하기'
-                                  : '요일별로 다르게 설정하기',
+                              _isDaySpecific ? '한 번에 설정하기' : '요일별로 다르게 설정하기',
                             ),
                           ),
                         ),
@@ -156,10 +168,12 @@ class _ProAvailabilityScreenState extends State<ProAvailabilityScreen> {
         _selectedDays.remove(day);
       }
     });
+    _syncAvailabilityState();
   }
 
   void _addSharedRange() {
     setState(() => _sharedRanges.add(_TimeRange(start: '', end: '')));
+    _syncAvailabilityState();
   }
 
   void _removeSharedRange(_TimeRange range) {
@@ -168,10 +182,12 @@ class _ProAvailabilityScreenState extends State<ProAvailabilityScreen> {
       _sharedRanges.remove(range);
       range.dispose();
     });
+    _syncAvailabilityState();
   }
 
   void _addDayRange(String day) {
     setState(() => _dayRanges[day]!.add(_TimeRange(start: '', end: '')));
+    _syncAvailabilityState();
   }
 
   void _removeDayRange(String day, _TimeRange range) {
@@ -181,6 +197,26 @@ class _ProAvailabilityScreenState extends State<ProAvailabilityScreen> {
       ranges.remove(range);
       range.dispose();
     });
+    _syncAvailabilityState();
+  }
+
+  void _toggleScheduleMode() {
+    setState(() => _isDaySpecific = !_isDaySpecific);
+    _syncAvailabilityState();
+  }
+
+  void _syncAvailabilityState() {
+    ref
+        .read(signupFlowViewModelProvider.notifier)
+        .updateProAvailability(
+          selectedDays: _selectedDays,
+          sharedRanges: _sharedRanges.map((range) => range.value).toList(),
+          dayRanges: {
+            for (final entry in _dayRanges.entries)
+              entry.key: entry.value.map((range) => range.value).toList(),
+          },
+          isDaySpecific: _isDaySpecific,
+        );
   }
 
   void _goBack() {
@@ -192,9 +228,21 @@ class _ProAvailabilityScreenState extends State<ProAvailabilityScreen> {
   }
 
   void _continue() {
+    _syncAvailabilityState();
+    final validationError = ref
+        .read(signupFlowViewModelProvider.notifier)
+        .validateProAvailability();
+    if (validationError != null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(validationError.message)));
+      return;
+    }
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('프로 가입 완료 단계는 다음 작업에서 연결합니다.')));
+      ..showSnackBar(
+        const SnackBar(content: Text('프로 가입 완료 단계는 다음 작업에서 연결합니다.')),
+      );
   }
 }
 
@@ -272,12 +320,14 @@ class _SharedSchedule extends StatelessWidget {
     required this.ranges,
     required this.onAddRange,
     required this.onRemoveRange,
+    required this.onRangeChanged,
   });
 
   final Set<String> selectedDays;
   final List<_TimeRange> ranges;
   final VoidCallback onAddRange;
   final ValueChanged<_TimeRange> onRemoveRange;
+  final VoidCallback onRangeChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +348,10 @@ class _SharedSchedule extends StatelessWidget {
             ),
             Text(
               selectedDayLabel,
-              style: const TextStyle(color: AppColors.secondaryText, fontSize: 14),
+              style: const TextStyle(
+                color: AppColors.secondaryText,
+                fontSize: 14,
+              ),
             ),
           ],
         ),
@@ -306,7 +359,11 @@ class _SharedSchedule extends StatelessWidget {
         const _TimeLabels(fontSize: 14),
         const SizedBox(height: 12),
         for (final range in ranges) ...[
-          _TimeRangeRow(range: range, onRemove: () => onRemoveRange(range)),
+          _TimeRangeRow(
+            range: range,
+            onRemove: () => onRemoveRange(range),
+            onChanged: onRangeChanged,
+          ),
           const SizedBox(height: 8),
         ],
         _DashedAddButton(height: 38, onTap: onAddRange),
@@ -321,12 +378,14 @@ class _DaySpecificSchedule extends StatelessWidget {
     required this.ranges,
     required this.onAddRange,
     required this.onRemoveRange,
+    required this.onRangeChanged,
   });
 
   final Set<String> selectedDays;
   final Map<String, List<_TimeRange>> ranges;
   final ValueChanged<String> onAddRange;
   final void Function(String, _TimeRange) onRemoveRange;
+  final VoidCallback onRangeChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -358,6 +417,7 @@ class _DaySpecificSchedule extends StatelessWidget {
             ranges: ranges[day]!,
             onAddRange: () => onAddRange(day),
             onRemoveRange: (range) => onRemoveRange(day, range),
+            onRangeChanged: onRangeChanged,
           ),
           const SizedBox(height: 12),
         ],
@@ -372,12 +432,14 @@ class _DayScheduleCard extends StatelessWidget {
     required this.ranges,
     required this.onAddRange,
     required this.onRemoveRange,
+    required this.onRangeChanged,
   });
 
   final String dayName;
   final List<_TimeRange> ranges;
   final VoidCallback onAddRange;
   final ValueChanged<_TimeRange> onRemoveRange;
+  final VoidCallback onRangeChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -410,6 +472,7 @@ class _DayScheduleCard extends StatelessWidget {
                     range: range,
                     compact: true,
                     onRemove: () => onRemoveRange(range),
+                    onChanged: onRangeChanged,
                   ),
                   const SizedBox(height: 8),
                 ],
@@ -462,11 +525,13 @@ class _TimeRangeRow extends StatelessWidget {
   const _TimeRangeRow({
     required this.range,
     required this.onRemove,
+    required this.onChanged,
     this.compact = false,
   });
 
   final _TimeRange range;
   final VoidCallback onRemove;
+  final VoidCallback onChanged;
   final bool compact;
 
   @override
@@ -480,6 +545,7 @@ class _TimeRangeRow extends StatelessWidget {
             controller: range.startController,
             height: height,
             fontSize: fontSize,
+            onChanged: onChanged,
           ),
         ),
         const SizedBox(width: 8),
@@ -502,6 +568,7 @@ class _TimeRangeRow extends StatelessWidget {
             controller: range.endController,
             height: height,
             fontSize: fontSize,
+            onChanged: onChanged,
           ),
         ),
         const SizedBox(width: 8),
@@ -529,10 +596,12 @@ class _TimeInput extends StatelessWidget {
     required this.controller,
     required this.height,
     required this.fontSize,
+    required this.onChanged,
   });
   final TextEditingController controller;
   final double height;
   final double fontSize;
+  final VoidCallback onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -577,6 +646,7 @@ class _TimeInput extends StatelessWidget {
 
     if (selectedTime == null) return;
     controller.text = _formatTime(selectedTime);
+    onChanged();
   }
 }
 
@@ -645,7 +715,9 @@ class _ScheduleDashedBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final path = Path()
-      ..addRRect(RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(radius)));
+      ..addRRect(
+        RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(radius)),
+      );
     final metric = path.computeMetrics().single;
     final paint = Paint()
       ..color = AppColors.dashedBorder
@@ -662,11 +734,20 @@ class _ScheduleDashedBorderPainter extends CustomPainter {
 
 class _TimeRange {
   _TimeRange({required String start, required String end})
-      : startController = TextEditingController(text: start),
-        endController = TextEditingController(text: end);
+    : startController = TextEditingController(text: start),
+      endController = TextEditingController(text: end);
+
+  factory _TimeRange.fromValue(LessonTimeRangeInput value) {
+    return _TimeRange(start: value.start, end: value.end);
+  }
 
   final TextEditingController startController;
   final TextEditingController endController;
+
+  LessonTimeRangeInput get value => LessonTimeRangeInput(
+    start: startController.text,
+    end: endController.text,
+  );
 
   void dispose() {
     startController.dispose();
@@ -676,7 +757,9 @@ class _TimeRange {
 
 String _dayLabel(Set<String> days) {
   const weekdayDays = {'월', '화', '수', '목', '금'};
-  if (days.length == 5 && days.containsAll(weekdayDays)) return '월 · 화 · 수 · 목 · 금';
+  if (days.length == 5 && days.containsAll(weekdayDays)) {
+    return '월 · 화 · 수 · 목 · 금';
+  }
   if (days.isEmpty) return '요일을 선택하세요';
   return days.join(' · ');
 }

@@ -3,19 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
-import 'package:swingmate/features/auth/di/providers/member_signup_providers.dart';
+import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
+import 'package:swingmate/features/auth/presentation/helpers/signup_messages.dart';
+import 'package:swingmate/features/auth/presentation/states/signup_flow_state.dart';
 import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.dart';
 import 'package:swingmate/features/auth/presentation/widgets/verification_code_input.dart';
 
 class PhoneVerificationScreen extends ConsumerStatefulWidget {
-  const PhoneVerificationScreen({
-    required this.phoneNumber,
-    this.isProSignup = false,
-    super.key,
-  });
-
-  final String phoneNumber;
-  final bool isProSignup;
+  const PhoneVerificationScreen({super.key});
 
   @override
   ConsumerState<PhoneVerificationScreen> createState() =>
@@ -36,7 +31,7 @@ class _PhoneVerificationScreenState
       }
 
       final testCode = ref
-          .read(memberSignupViewModelProvider)
+          .read(signupFlowViewModelProvider)
           .verificationTestCode;
       if (testCode != null) {
         ScaffoldMessenger.of(context)
@@ -53,7 +48,8 @@ class _PhoneVerificationScreenState
 
   @override
   Widget build(BuildContext context) {
-    final signupState = ref.watch(memberSignupViewModelProvider);
+    final signupState = ref.watch(signupFlowViewModelProvider);
+    final isBusy = signupState.verificationAction != VerificationAction.idle;
     final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
 
     return Scaffold(
@@ -88,7 +84,7 @@ class _PhoneVerificationScreenState
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '${widget.phoneNumber}로 인증번호를 보냈습니다.',
+                          '${signupState.phoneNumber}로 인증번호를 보냈습니다.',
                           style: const TextStyle(
                             color: AppColors.secondaryText,
                             fontSize: 18,
@@ -117,9 +113,7 @@ class _PhoneVerificationScreenState
                           width: double.infinity,
                           height: 42,
                           child: TextButton(
-                            onPressed: () {
-                              _resendCode();
-                            },
+                            onPressed: isBusy ? null : _resendCode,
                             style: TextButton.styleFrom(
                               foregroundColor: AppColors.secondaryText,
                               shape: RoundedRectangleBorder(
@@ -140,7 +134,7 @@ class _PhoneVerificationScreenState
                     width: double.infinity,
                     height: 48,
                     child: FilledButton(
-                      onPressed: _verifyCode,
+                      onPressed: isBusy ? null : _verifyCode,
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.action,
                         foregroundColor: AppColors.surface,
@@ -180,20 +174,21 @@ class _PhoneVerificationScreenState
       return;
     }
 
-    context.goNamed(
-      widget.isProSignup
-          ? AppRoutes.proProfileName
-          : AppRoutes.memberProfileName,
-    );
+    final role = ref.read(signupFlowViewModelProvider).role;
+    context.goNamed(switch (role) {
+      SignupRole.pro => AppRoutes.proProfileName,
+      SignupRole.member => AppRoutes.memberProfileName,
+      null => AppRoutes.roleSelectionName,
+    });
   }
 
   Future<void> _resendCode() async {
     _codeController.clear();
     setState(() => _verificationInputKey = UniqueKey());
-    ref.read(memberSignupViewModelProvider.notifier).updateVerificationCode('');
+    ref.read(signupFlowViewModelProvider.notifier).updateVerificationCode('');
 
     final delivery = await ref
-        .read(memberSignupViewModelProvider.notifier)
+        .read(signupFlowViewModelProvider.notifier)
         .resendVerificationCode();
     if (!mounted) {
       return;
@@ -205,7 +200,13 @@ class _PhoneVerificationScreenState
         SnackBar(
           content: Text(
             delivery == null
-                ? '인증번호를 다시 보내지 못했습니다.'
+                ? ref
+                          .read(signupFlowViewModelProvider)
+                          .verificationFailure
+                          ?.message ??
+                      '인증번호를 다시 보내지 못했습니다.'
+                : delivery.testCode == null
+                ? '인증번호를 다시 보냈습니다.'
                 : '임시 인증번호는 ${delivery.testCode} 입니다.',
           ),
         ),
@@ -213,13 +214,13 @@ class _PhoneVerificationScreenState
   }
 
   Future<void> _verifyCode() async {
-    final signupViewModel = ref.read(memberSignupViewModelProvider.notifier);
+    final signupViewModel = ref.read(signupFlowViewModelProvider.notifier);
     signupViewModel.updateVerificationCode(_codeController.text);
     final validationError = signupViewModel.validateVerificationCode();
     if (validationError != null) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(validationError)));
+        ..showSnackBar(SnackBar(content: Text(validationError.message)));
       return;
     }
 
@@ -233,7 +234,10 @@ class _PhoneVerificationScreenState
         ..showSnackBar(
           SnackBar(
             content: Text(
-              ref.read(memberSignupViewModelProvider).verificationError ??
+              ref
+                      .read(signupFlowViewModelProvider)
+                      .verificationFailure
+                      ?.message ??
                   '인증번호가 일치하지 않습니다.',
             ),
           ),
@@ -241,8 +245,9 @@ class _PhoneVerificationScreenState
       return;
     }
 
+    final role = ref.read(signupFlowViewModelProvider).role;
     context.pushNamed(
-      widget.isProSignup
+      role == SignupRole.pro
           ? AppRoutes.proCareerName
           : AppRoutes.lessonPreferencesName,
     );

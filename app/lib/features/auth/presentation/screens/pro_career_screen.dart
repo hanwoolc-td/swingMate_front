@@ -1,24 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
 import 'package:swingmate/core/theme/app_assets.dart';
+import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
+import 'package:swingmate/features/auth/presentation/helpers/signup_messages.dart';
 import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.dart';
 
 /// Figma 314:9562 — 프로의 소개와 경력을 입력하는 가입 화면입니다.
-class ProCareerScreen extends StatefulWidget {
+class ProCareerScreen extends ConsumerStatefulWidget {
   const ProCareerScreen({super.key});
 
   @override
-  State<ProCareerScreen> createState() => _ProCareerScreenState();
+  ConsumerState<ProCareerScreen> createState() => _ProCareerScreenState();
 }
 
-class _ProCareerScreenState extends State<ProCareerScreen> {
+class _ProCareerScreenState extends ConsumerState<ProCareerScreen> {
   final _introductionController = TextEditingController();
-  final _careerControllers = [TextEditingController()];
+  final _careerControllers = <TextEditingController>[];
   String? _introductionError;
   String? _careerError;
+
+  @override
+  void initState() {
+    super.initState();
+    final draft = ref.read(signupFlowViewModelProvider).pro;
+    _introductionController.text = draft.introduction;
+    _careerControllers.addAll(
+      draft.careers.map((value) => TextEditingController(text: value)),
+    );
+  }
 
   @override
   void dispose() {
@@ -85,7 +98,10 @@ class _ProCareerScreenState extends State<ProCareerScreen> {
                         _IntroductionField(
                           controller: _introductionController,
                           errorText: _introductionError,
-                          onChanged: (_) {
+                          onChanged: (value) {
+                            ref
+                                .read(signupFlowViewModelProvider.notifier)
+                                .updateProIntroduction(value);
                             if (_introductionError != null) {
                               setState(() => _introductionError = null);
                             }
@@ -101,10 +117,14 @@ class _ProCareerScreenState extends State<ProCareerScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        for (final controller in _careerControllers) ...[
+                        for (final (index, controller)
+                            in _careerControllers.indexed) ...[
                           _CareerField(
                             controller: controller,
-                            onChanged: (_) {
+                            onChanged: (value) {
+                              ref
+                                  .read(signupFlowViewModelProvider.notifier)
+                                  .updateProCareer(index, value);
                               if (_careerError != null) {
                                 setState(() => _careerError = null);
                               }
@@ -167,17 +187,23 @@ class _ProCareerScreenState extends State<ProCareerScreen> {
   }
 
   void _addCareer() {
+    ref.read(signupFlowViewModelProvider.notifier).addProCareer();
     setState(() => _careerControllers.add(TextEditingController()));
   }
 
   void _continue() {
-    final introductionError = _introductionController.text.trim().isEmpty
-        ? '프로 소개를 입력해주세요.'
+    final signupViewModel = ref.read(signupFlowViewModelProvider.notifier);
+    signupViewModel.updateProIntroduction(_introductionController.text);
+    for (final (index, controller) in _careerControllers.indexed) {
+      signupViewModel.updateProCareer(index, controller.text);
+    }
+    final errors = signupViewModel.validateProCareer();
+    final introductionError =
+        errors.contains(SignupValidationError.proIntroductionRequired)
+        ? SignupValidationError.proIntroductionRequired.message
         : null;
-    final careerError = _careerControllers.every(
-      (controller) => controller.text.trim().isEmpty,
-    )
-        ? '경력을 하나 이상 입력해주세요.'
+    final careerError = errors.contains(SignupValidationError.proCareerRequired)
+        ? SignupValidationError.proCareerRequired.message
         : null;
 
     setState(() {
@@ -238,9 +264,7 @@ class _IntroductionField extends StatelessWidget {
               enabledBorder: _borderFor(errorText),
               focusedBorder: _fieldBorder.copyWith(
                 borderSide: BorderSide(
-                  color: errorText == null
-                      ? AppColors.ink
-                      : AppColors.required,
+                  color: errorText == null ? AppColors.ink : AppColors.required,
                 ),
               ),
             ),
@@ -326,9 +350,7 @@ class _AddCareerButton extends StatelessWidget {
           child: Container(
             width: double.infinity,
             height: 40,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
             child: CustomPaint(
               foregroundPainter: _DashedBorderPainter(),
               child: Row(

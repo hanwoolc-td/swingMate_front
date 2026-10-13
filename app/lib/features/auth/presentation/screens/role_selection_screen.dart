@@ -1,20 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
 import 'package:swingmate/core/theme/app_assets.dart';
+import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
+import 'package:swingmate/features/auth/presentation/states/signup_flow_state.dart';
 import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.dart';
 import 'package:swingmate/features/auth/presentation/widgets/role_selection_card.dart';
 
-class RoleSelectionScreen extends StatefulWidget {
+class RoleSelectionScreen extends ConsumerStatefulWidget {
   const RoleSelectionScreen({super.key});
 
   @override
-  State<RoleSelectionScreen> createState() => _RoleSelectionScreenState();
+  ConsumerState<RoleSelectionScreen> createState() =>
+      _RoleSelectionScreenState();
 }
 
-class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
+class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
   bool _isMember = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _isMember = ref.read(signupFlowViewModelProvider).role != SignupRole.pro;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +136,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
   }
 
   void _continue() {
+    final role = _isMember ? SignupRole.member : SignupRole.pro;
+    ref.read(signupFlowViewModelProvider.notifier).selectRole(role);
     if (_isMember) {
       context.pushNamed(AppRoutes.memberProfileName);
       return;

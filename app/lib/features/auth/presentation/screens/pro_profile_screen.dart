@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
-import 'package:swingmate/features/auth/di/providers/member_signup_providers.dart';
+import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
+import 'package:swingmate/features/auth/presentation/helpers/signup_messages.dart';
+import 'package:swingmate/features/auth/presentation/states/signup_flow_state.dart';
 import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.dart';
 import 'package:swingmate/features/auth/presentation/widgets/profile_field.dart';
 import 'package:swingmate/features/auth/presentation/widgets/profile_photo_placeholder.dart';
@@ -26,7 +28,7 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
   @override
   void initState() {
     super.initState();
-    final signupState = ref.read(memberSignupViewModelProvider);
+    final signupState = ref.read(signupFlowViewModelProvider);
     _nameController.text = signupState.name;
     _phoneController.text = signupState.phoneNumber;
   }
@@ -41,7 +43,9 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final signupState = ref.watch(memberSignupViewModelProvider);
+    final verificationAction = ref.watch(
+      signupFlowViewModelProvider.select((state) => state.verificationAction),
+    );
     final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
 
     return Scaffold(
@@ -125,7 +129,8 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
                     height: 48,
                     child: FilledButton(
                       focusNode: _requestButtonFocusNode,
-                      onPressed: signupState.isSendingVerificationCode
+                      onPressed:
+                          verificationAction == VerificationAction.sending
                           ? null
                           : _requestVerificationCode,
                       style: FilledButton.styleFrom(
@@ -139,7 +144,7 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      child: signupState.isSendingVerificationCode
+                      child: verificationAction == VerificationAction.sending
                           ? const SizedBox(
                               width: 20,
                               height: 20,
@@ -170,9 +175,9 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
   }
 
   void _showPhotoComingSoon() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('프로필 사진 등록은 다음 단계에서 연결합니다.')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('프로필 사진 등록은 다음 단계에서 연결합니다.')));
   }
 
   void _handlePhoneChanged(String phoneNumber) {
@@ -190,14 +195,14 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
   }
 
   Future<void> _requestVerificationCode() async {
-    final signupViewModel = ref.read(memberSignupViewModelProvider.notifier);
+    final signupViewModel = ref.read(signupFlowViewModelProvider.notifier);
     signupViewModel
       ..updateName(_nameController.text)
       ..updatePhoneNumber(_phoneController.text);
 
     final validationError = signupViewModel.validateProfile();
     if (validationError != null) {
-      _showValidationMessage(validationError);
+      _showValidationMessage(validationError.message);
       return;
     }
 
@@ -207,17 +212,13 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
     }
     if (delivery == null) {
       _showValidationMessage(
-        ref.read(memberSignupViewModelProvider).verificationError ??
+        ref.read(signupFlowViewModelProvider).verificationFailure?.message ??
             '인증번호를 보내지 못했습니다.',
       );
       return;
     }
 
-    context.pushNamed(
-      AppRoutes.phoneVerificationName,
-      queryParameters: const {'role': 'pro'},
-      extra: ref.read(memberSignupViewModelProvider).phoneNumber,
-    );
+    context.pushNamed(AppRoutes.phoneVerificationName);
   }
 
   void _showValidationMessage(String message) {

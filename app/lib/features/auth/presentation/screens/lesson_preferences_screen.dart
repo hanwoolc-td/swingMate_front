@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
-import 'package:swingmate/features/auth/di/providers/member_signup_providers.dart';
+import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
+import 'package:swingmate/features/auth/presentation/helpers/signup_messages.dart';
 import 'package:swingmate/features/auth/presentation/widgets/golf_experience_option.dart';
 import 'package:swingmate/features/auth/presentation/widgets/lesson_interest_chip.dart';
 import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.dart';
@@ -34,7 +35,9 @@ class _LessonPreferencesScreenState
 
   @override
   Widget build(BuildContext context) {
-    final signupState = ref.watch(memberSignupViewModelProvider);
+    final memberDraft = ref.watch(
+      signupFlowViewModelProvider.select((state) => state.member),
+    );
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -71,9 +74,9 @@ class _LessonPreferencesScreenState
                           ),
                         ),
                         const SizedBox(height: 48),
-                        _buildInterestSection(signupState.selectedInterests),
+                        _buildInterestSection(memberDraft.selectedInterests),
                         const SizedBox(height: 32),
-                        _buildExperienceSection(signupState.selectedExperience),
+                        _buildExperienceSection(memberDraft.selectedExperience),
                       ],
                     ),
                   ),
@@ -175,7 +178,7 @@ class _LessonPreferencesScreenState
             label: experience,
             isSelected: selectedExperience == experience,
             onTap: () => ref
-                .read(memberSignupViewModelProvider.notifier)
+                .read(signupFlowViewModelProvider.notifier)
                 .selectExperience(experience),
           ),
       ],
@@ -183,7 +186,7 @@ class _LessonPreferencesScreenState
   }
 
   void _toggleInterest(String interest) {
-    ref.read(memberSignupViewModelProvider.notifier).toggleInterest(interest);
+    ref.read(signupFlowViewModelProvider.notifier).toggleInterest(interest);
   }
 
   void _goBack() {
@@ -197,12 +200,12 @@ class _LessonPreferencesScreenState
 
   void _continue() {
     final validationError = ref
-        .read(memberSignupViewModelProvider.notifier)
+        .read(signupFlowViewModelProvider.notifier)
         .validateLessonPreferences();
     if (validationError != null) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(validationError)));
+        ..showSnackBar(SnackBar(content: Text(validationError.message)));
       return;
     }
 

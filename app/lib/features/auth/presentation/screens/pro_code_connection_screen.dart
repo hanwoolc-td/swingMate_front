@@ -5,7 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
 import 'package:swingmate/core/theme/app_assets.dart';
-import 'package:swingmate/features/auth/di/providers/member_signup_providers.dart';
+import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
+import 'package:swingmate/features/auth/presentation/helpers/signup_messages.dart';
 import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.dart';
 
 class ProCodeConnectionScreen extends ConsumerStatefulWidget {
@@ -23,7 +24,7 @@ class _ProCodeConnectionScreenState
   @override
   void initState() {
     super.initState();
-    _codeController.text = ref.read(memberSignupViewModelProvider).proCode;
+    _codeController.text = ref.read(signupFlowViewModelProvider).member.proCode;
   }
 
   @override
@@ -180,11 +181,11 @@ class _ProCodeConnectionScreenState
   }
 
   void _connect() {
-    final signupViewModel = ref.read(memberSignupViewModelProvider.notifier);
+    final signupViewModel = ref.read(signupFlowViewModelProvider.notifier);
     signupViewModel.updateProCode(_codeController.text);
     final validationError = signupViewModel.validateProCode();
     if (validationError != null) {
-      _showMessage(validationError);
+      _showMessage(validationError.message);
       return;
     }
 

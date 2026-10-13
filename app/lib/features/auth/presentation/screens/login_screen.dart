@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
 import 'package:swingmate/core/theme/app_assets.dart';
+import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
 import 'package:swingmate/features/auth/presentation/widgets/login_logo_placeholder.dart';
 import 'package:swingmate/features/auth/presentation/widgets/social_login_button.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
@@ -36,7 +38,7 @@ class LoginScreen extends StatelessWidget {
                         iconIsSvg: true,
                         backgroundColor: AppColors.kakao,
                         foregroundColor: AppColors.kakaoForeground,
-                        onPressed: () => _showRoleSelection(context),
+                        onPressed: () => _showRoleSelection(context, ref),
                       ),
                       const SizedBox(height: 16),
                       SocialLoginButton(
@@ -48,7 +50,7 @@ class LoginScreen extends StatelessWidget {
                         borderColor: AppColors.borderSubtle,
                         shadowBlurRadius: 8,
                         fontWeight: FontWeight.w500,
-                        onPressed: () => _showRoleSelection(context),
+                        onPressed: () => _showRoleSelection(context, ref),
                       ),
                       const SizedBox(height: 16),
                       TextButton(
@@ -85,6 +87,7 @@ void _showComingSoon(BuildContext context, String feature) {
     ..showSnackBar(SnackBar(content: Text('$feature 기능은 다음 단계에서 연결합니다.')));
 }
 
-void _showRoleSelection(BuildContext context) {
+void _showRoleSelection(BuildContext context, WidgetRef ref) {
+  ref.read(signupFlowViewModelProvider.notifier).reset();
   context.pushNamed(AppRoutes.roleSelectionName);
 }

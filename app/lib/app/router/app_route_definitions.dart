@@ -54,10 +54,7 @@ abstract final class AppRouteDefinitions {
     GoRoute(
       path: AppRoutes.phoneVerificationPath,
       name: AppRoutes.phoneVerificationName,
-      builder: (context, state) => PhoneVerificationScreen(
-        phoneNumber: state.extra as String? ?? '010-1234-5678',
-        isProSignup: state.uri.queryParameters['role'] == 'pro',
-      ),
+      builder: (context, state) => const PhoneVerificationScreen(),
     ),
     GoRoute(
       path: AppRoutes.lessonPreferencesPath,
