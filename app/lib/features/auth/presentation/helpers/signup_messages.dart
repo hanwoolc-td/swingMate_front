@@ -39,5 +39,22 @@ extension VerificationFailureMessage on VerificationFailure {
     VerificationFailure.codeMismatch => '인증번호가 일치하지 않습니다.',
     VerificationFailure.verificationFailed =>
       '인증번호를 확인하지 못했습니다. 잠시 후 다시 시도해주세요.',
+    VerificationFailure.phoneAlreadyInUse => '이미 다른 계정에서 사용 중인 번호입니다.',
+    VerificationFailure.tooManyRequests => '인증번호 요청이 너무 많습니다. 잠시 후 다시 시도해주세요.',
+    VerificationFailure.attemptsExceeded =>
+      '인증 시도 횟수를 초과했습니다. 인증번호를 다시 요청해주세요.',
+  };
+}
+
+extension SubmissionFailureMessage on SubmissionFailure {
+  String get message => switch (this) {
+    SubmissionFailure.network => '서버에 연결하지 못했습니다. 네트워크를 확인해주세요.',
+    SubmissionFailure.invalidSocialToken => '로그인 정보를 확인하지 못했습니다. 다시 시도해주세요.',
+    SubmissionFailure.providerUnavailable =>
+      '소셜 로그인 서비스에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.',
+    SubmissionFailure.phoneAlreadyInUse => '이미 다른 계정에서 사용 중인 번호입니다.',
+    SubmissionFailure.verificationExpired => '휴대폰 인증이 만료되었습니다. 처음부터 다시 인증해주세요.',
+    SubmissionFailure.invalidInput => '입력한 정보를 확인해주세요.',
+    SubmissionFailure.unknown => '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
   };
 }

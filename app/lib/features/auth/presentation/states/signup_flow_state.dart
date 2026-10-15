@@ -11,6 +11,21 @@ enum VerificationFailure {
   expired,
   codeMismatch,
   verificationFailed,
+  phoneAlreadyInUse,
+  tooManyRequests,
+  attemptsExceeded,
+}
+
+enum SubmissionAction { idle, signingIn, completing }
+
+enum SubmissionFailure {
+  network,
+  invalidSocialToken,
+  providerUnavailable,
+  phoneAlreadyInUse,
+  verificationExpired,
+  invalidInput,
+  unknown,
 }
 
 @freezed
@@ -66,6 +81,8 @@ abstract class SignupFlowState with _$SignupFlowState {
     @Default(VerificationAction.idle) VerificationAction verificationAction,
     String? verificationTestCode,
     VerificationFailure? verificationFailure,
+    @Default(SubmissionAction.idle) SubmissionAction submissionAction,
+    SubmissionFailure? submissionFailure,
     @Default(MemberSignupDraft()) MemberSignupDraft member,
     @Default(ProSignupDraft()) ProSignupDraft pro,
   }) = _SignupFlowState;

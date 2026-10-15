@@ -861,7 +861,7 @@ as bool,
 /// @nodoc
 mixin _$SignupFlowState {
 
- SignupRole? get role; String get name; String get phoneNumber; String get verificationCode; Duration get verificationRemaining; VerificationAction get verificationAction; String? get verificationTestCode; VerificationFailure? get verificationFailure; MemberSignupDraft get member; ProSignupDraft get pro;
+ SignupRole? get role; String get name; String get phoneNumber; String get verificationCode; Duration get verificationRemaining; VerificationAction get verificationAction; String? get verificationTestCode; VerificationFailure? get verificationFailure; SubmissionAction get submissionAction; SubmissionFailure? get submissionFailure; MemberSignupDraft get member; ProSignupDraft get pro;
 /// Create a copy of SignupFlowState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -873,20 +873,20 @@ $SignupFlowStateCopyWith<SignupFlowState> get copyWith => _$SignupFlowStateCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as SignupFlowState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignupFlowState&&(identical(other.role, _this.role) || other.role == _this.role)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.phoneNumber, _this.phoneNumber) || other.phoneNumber == _this.phoneNumber)&&(identical(other.verificationCode, _this.verificationCode) || other.verificationCode == _this.verificationCode)&&(identical(other.verificationRemaining, _this.verificationRemaining) || other.verificationRemaining == _this.verificationRemaining)&&(identical(other.verificationAction, _this.verificationAction) || other.verificationAction == _this.verificationAction)&&(identical(other.verificationTestCode, _this.verificationTestCode) || other.verificationTestCode == _this.verificationTestCode)&&(identical(other.verificationFailure, _this.verificationFailure) || other.verificationFailure == _this.verificationFailure)&&(identical(other.member, _this.member) || other.member == _this.member)&&(identical(other.pro, _this.pro) || other.pro == _this.pro));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignupFlowState&&(identical(other.role, _this.role) || other.role == _this.role)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.phoneNumber, _this.phoneNumber) || other.phoneNumber == _this.phoneNumber)&&(identical(other.verificationCode, _this.verificationCode) || other.verificationCode == _this.verificationCode)&&(identical(other.verificationRemaining, _this.verificationRemaining) || other.verificationRemaining == _this.verificationRemaining)&&(identical(other.verificationAction, _this.verificationAction) || other.verificationAction == _this.verificationAction)&&(identical(other.verificationTestCode, _this.verificationTestCode) || other.verificationTestCode == _this.verificationTestCode)&&(identical(other.verificationFailure, _this.verificationFailure) || other.verificationFailure == _this.verificationFailure)&&(identical(other.submissionAction, _this.submissionAction) || other.submissionAction == _this.submissionAction)&&(identical(other.submissionFailure, _this.submissionFailure) || other.submissionFailure == _this.submissionFailure)&&(identical(other.member, _this.member) || other.member == _this.member)&&(identical(other.pro, _this.pro) || other.pro == _this.pro));
 }
 
 
 @override
 int get hashCode {
   final _this = this as SignupFlowState;
-  return Object.hash(runtimeType,_this.role,_this.name,_this.phoneNumber,_this.verificationCode,_this.verificationRemaining,_this.verificationAction,_this.verificationTestCode,_this.verificationFailure,_this.member,_this.pro);
+  return Object.hash(runtimeType,_this.role,_this.name,_this.phoneNumber,_this.verificationCode,_this.verificationRemaining,_this.verificationAction,_this.verificationTestCode,_this.verificationFailure,_this.submissionAction,_this.submissionFailure,_this.member,_this.pro);
 }
 
 @override
 String toString() {
   final _this = this as SignupFlowState;
-  return 'SignupFlowState(role: ${_this.role}, name: ${_this.name}, phoneNumber: ${_this.phoneNumber}, verificationCode: ${_this.verificationCode}, verificationRemaining: ${_this.verificationRemaining}, verificationAction: ${_this.verificationAction}, verificationTestCode: ${_this.verificationTestCode}, verificationFailure: ${_this.verificationFailure}, member: ${_this.member}, pro: ${_this.pro})';
+  return 'SignupFlowState(role: ${_this.role}, name: ${_this.name}, phoneNumber: ${_this.phoneNumber}, verificationCode: ${_this.verificationCode}, verificationRemaining: ${_this.verificationRemaining}, verificationAction: ${_this.verificationAction}, verificationTestCode: ${_this.verificationTestCode}, verificationFailure: ${_this.verificationFailure}, submissionAction: ${_this.submissionAction}, submissionFailure: ${_this.submissionFailure}, member: ${_this.member}, pro: ${_this.pro})';
 }
 
 
@@ -897,7 +897,7 @@ abstract mixin class $SignupFlowStateCopyWith<$Res>  {
   factory $SignupFlowStateCopyWith(SignupFlowState value, $Res Function(SignupFlowState) _then) = _$SignupFlowStateCopyWithImpl;
 @useResult
 $Res call({
- SignupRole? role, String name, String phoneNumber, String verificationCode, Duration verificationRemaining, VerificationAction verificationAction, String? verificationTestCode, VerificationFailure? verificationFailure, MemberSignupDraft member, ProSignupDraft pro
+ SignupRole? role, String name, String phoneNumber, String verificationCode, Duration verificationRemaining, VerificationAction verificationAction, String? verificationTestCode, VerificationFailure? verificationFailure, SubmissionAction submissionAction, SubmissionFailure? submissionFailure, MemberSignupDraft member, ProSignupDraft pro
 });
 
 
@@ -914,7 +914,7 @@ class _$SignupFlowStateCopyWithImpl<$Res>
 
 /// Create a copy of SignupFlowState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? role = freezed,Object? name = null,Object? phoneNumber = null,Object? verificationCode = null,Object? verificationRemaining = null,Object? verificationAction = null,Object? verificationTestCode = freezed,Object? verificationFailure = freezed,Object? member = null,Object? pro = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? role = freezed,Object? name = null,Object? phoneNumber = null,Object? verificationCode = null,Object? verificationRemaining = null,Object? verificationAction = null,Object? verificationTestCode = freezed,Object? verificationFailure = freezed,Object? submissionAction = null,Object? submissionFailure = freezed,Object? member = null,Object? pro = null,}) {
   return _then(SignupFlowState(
 role: freezed == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as SignupRole?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -924,7 +924,9 @@ as String,verificationRemaining: null == verificationRemaining ? _self.verificat
 as Duration,verificationAction: null == verificationAction ? _self.verificationAction : verificationAction // ignore: cast_nullable_to_non_nullable
 as VerificationAction,verificationTestCode: freezed == verificationTestCode ? _self.verificationTestCode : verificationTestCode // ignore: cast_nullable_to_non_nullable
 as String?,verificationFailure: freezed == verificationFailure ? _self.verificationFailure : verificationFailure // ignore: cast_nullable_to_non_nullable
-as VerificationFailure?,member: null == member ? _self.member : member // ignore: cast_nullable_to_non_nullable
+as VerificationFailure?,submissionAction: null == submissionAction ? _self.submissionAction : submissionAction // ignore: cast_nullable_to_non_nullable
+as SubmissionAction,submissionFailure: freezed == submissionFailure ? _self.submissionFailure : submissionFailure // ignore: cast_nullable_to_non_nullable
+as SubmissionFailure?,member: null == member ? _self.member : member // ignore: cast_nullable_to_non_nullable
 as MemberSignupDraft,pro: null == pro ? _self.pro : pro // ignore: cast_nullable_to_non_nullable
 as ProSignupDraft,
   ));
@@ -1029,10 +1031,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SignupRole? role,  String name,  String phoneNumber,  String verificationCode,  Duration verificationRemaining,  VerificationAction verificationAction,  String? verificationTestCode,  VerificationFailure? verificationFailure,  MemberSignupDraft member,  ProSignupDraft pro)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SignupRole? role,  String name,  String phoneNumber,  String verificationCode,  Duration verificationRemaining,  VerificationAction verificationAction,  String? verificationTestCode,  VerificationFailure? verificationFailure,  SubmissionAction submissionAction,  SubmissionFailure? submissionFailure,  MemberSignupDraft member,  ProSignupDraft pro)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SignupFlowState() when $default != null:
-return $default(_that.role,_that.name,_that.phoneNumber,_that.verificationCode,_that.verificationRemaining,_that.verificationAction,_that.verificationTestCode,_that.verificationFailure,_that.member,_that.pro);case _:
+return $default(_that.role,_that.name,_that.phoneNumber,_that.verificationCode,_that.verificationRemaining,_that.verificationAction,_that.verificationTestCode,_that.verificationFailure,_that.submissionAction,_that.submissionFailure,_that.member,_that.pro);case _:
   return orElse();
 
 }
@@ -1050,10 +1052,10 @@ return $default(_that.role,_that.name,_that.phoneNumber,_that.verificationCode,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SignupRole? role,  String name,  String phoneNumber,  String verificationCode,  Duration verificationRemaining,  VerificationAction verificationAction,  String? verificationTestCode,  VerificationFailure? verificationFailure,  MemberSignupDraft member,  ProSignupDraft pro)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SignupRole? role,  String name,  String phoneNumber,  String verificationCode,  Duration verificationRemaining,  VerificationAction verificationAction,  String? verificationTestCode,  VerificationFailure? verificationFailure,  SubmissionAction submissionAction,  SubmissionFailure? submissionFailure,  MemberSignupDraft member,  ProSignupDraft pro)  $default,) {final _that = this;
 switch (_that) {
 case _SignupFlowState():
-return $default(_that.role,_that.name,_that.phoneNumber,_that.verificationCode,_that.verificationRemaining,_that.verificationAction,_that.verificationTestCode,_that.verificationFailure,_that.member,_that.pro);case _:
+return $default(_that.role,_that.name,_that.phoneNumber,_that.verificationCode,_that.verificationRemaining,_that.verificationAction,_that.verificationTestCode,_that.verificationFailure,_that.submissionAction,_that.submissionFailure,_that.member,_that.pro);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1070,10 +1072,10 @@ return $default(_that.role,_that.name,_that.phoneNumber,_that.verificationCode,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SignupRole? role,  String name,  String phoneNumber,  String verificationCode,  Duration verificationRemaining,  VerificationAction verificationAction,  String? verificationTestCode,  VerificationFailure? verificationFailure,  MemberSignupDraft member,  ProSignupDraft pro)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SignupRole? role,  String name,  String phoneNumber,  String verificationCode,  Duration verificationRemaining,  VerificationAction verificationAction,  String? verificationTestCode,  VerificationFailure? verificationFailure,  SubmissionAction submissionAction,  SubmissionFailure? submissionFailure,  MemberSignupDraft member,  ProSignupDraft pro)?  $default,) {final _that = this;
 switch (_that) {
 case _SignupFlowState() when $default != null:
-return $default(_that.role,_that.name,_that.phoneNumber,_that.verificationCode,_that.verificationRemaining,_that.verificationAction,_that.verificationTestCode,_that.verificationFailure,_that.member,_that.pro);case _:
+return $default(_that.role,_that.name,_that.phoneNumber,_that.verificationCode,_that.verificationRemaining,_that.verificationAction,_that.verificationTestCode,_that.verificationFailure,_that.submissionAction,_that.submissionFailure,_that.member,_that.pro);case _:
   return null;
 
 }
@@ -1085,7 +1087,7 @@ return $default(_that.role,_that.name,_that.phoneNumber,_that.verificationCode,_
 
 
 class _SignupFlowState implements SignupFlowState {
-  const _SignupFlowState({this.role, this.name = '', this.phoneNumber = '', this.verificationCode = '', this.verificationRemaining = Duration.zero, this.verificationAction = VerificationAction.idle, this.verificationTestCode, this.verificationFailure, this.member = const MemberSignupDraft(), this.pro = const ProSignupDraft()});
+  const _SignupFlowState({this.role, this.name = '', this.phoneNumber = '', this.verificationCode = '', this.verificationRemaining = Duration.zero, this.verificationAction = VerificationAction.idle, this.verificationTestCode, this.verificationFailure, this.submissionAction = SubmissionAction.idle, this.submissionFailure, this.member = const MemberSignupDraft(), this.pro = const ProSignupDraft()});
   
 
 @override final  SignupRole? role;
@@ -1096,6 +1098,8 @@ class _SignupFlowState implements SignupFlowState {
 @override@JsonKey() final  VerificationAction verificationAction;
 @override final  String? verificationTestCode;
 @override final  VerificationFailure? verificationFailure;
+@override@JsonKey() final  SubmissionAction submissionAction;
+@override final  SubmissionFailure? submissionFailure;
 @override@JsonKey() final  MemberSignupDraft member;
 @override@JsonKey() final  ProSignupDraft pro;
 
@@ -1109,18 +1113,18 @@ _$SignupFlowStateCopyWith<_SignupFlowState> get copyWith => __$SignupFlowStateCo
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignupFlowState&&(identical(other.role, role) || other.role == role)&&(identical(other.name, name) || other.name == name)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.verificationCode, verificationCode) || other.verificationCode == verificationCode)&&(identical(other.verificationRemaining, verificationRemaining) || other.verificationRemaining == verificationRemaining)&&(identical(other.verificationAction, verificationAction) || other.verificationAction == verificationAction)&&(identical(other.verificationTestCode, verificationTestCode) || other.verificationTestCode == verificationTestCode)&&(identical(other.verificationFailure, verificationFailure) || other.verificationFailure == verificationFailure)&&(identical(other.member, member) || other.member == member)&&(identical(other.pro, pro) || other.pro == pro));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignupFlowState&&(identical(other.role, role) || other.role == role)&&(identical(other.name, name) || other.name == name)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.verificationCode, verificationCode) || other.verificationCode == verificationCode)&&(identical(other.verificationRemaining, verificationRemaining) || other.verificationRemaining == verificationRemaining)&&(identical(other.verificationAction, verificationAction) || other.verificationAction == verificationAction)&&(identical(other.verificationTestCode, verificationTestCode) || other.verificationTestCode == verificationTestCode)&&(identical(other.verificationFailure, verificationFailure) || other.verificationFailure == verificationFailure)&&(identical(other.submissionAction, submissionAction) || other.submissionAction == submissionAction)&&(identical(other.submissionFailure, submissionFailure) || other.submissionFailure == submissionFailure)&&(identical(other.member, member) || other.member == member)&&(identical(other.pro, pro) || other.pro == pro));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,role,name,phoneNumber,verificationCode,verificationRemaining,verificationAction,verificationTestCode,verificationFailure,member,pro);
+    return Object.hash(runtimeType,role,name,phoneNumber,verificationCode,verificationRemaining,verificationAction,verificationTestCode,verificationFailure,submissionAction,submissionFailure,member,pro);
 }
 
 @override
 String toString() {
-    return 'SignupFlowState(role: $role, name: $name, phoneNumber: $phoneNumber, verificationCode: $verificationCode, verificationRemaining: $verificationRemaining, verificationAction: $verificationAction, verificationTestCode: $verificationTestCode, verificationFailure: $verificationFailure, member: $member, pro: $pro)';
+    return 'SignupFlowState(role: $role, name: $name, phoneNumber: $phoneNumber, verificationCode: $verificationCode, verificationRemaining: $verificationRemaining, verificationAction: $verificationAction, verificationTestCode: $verificationTestCode, verificationFailure: $verificationFailure, submissionAction: $submissionAction, submissionFailure: $submissionFailure, member: $member, pro: $pro)';
 }
 
 
@@ -1131,7 +1135,7 @@ abstract mixin class _$SignupFlowStateCopyWith<$Res> implements $SignupFlowState
   factory _$SignupFlowStateCopyWith(_SignupFlowState value, $Res Function(_SignupFlowState) _then) = __$SignupFlowStateCopyWithImpl;
 @override @useResult
 $Res call({
- SignupRole? role, String name, String phoneNumber, String verificationCode, Duration verificationRemaining, VerificationAction verificationAction, String? verificationTestCode, VerificationFailure? verificationFailure, MemberSignupDraft member, ProSignupDraft pro
+ SignupRole? role, String name, String phoneNumber, String verificationCode, Duration verificationRemaining, VerificationAction verificationAction, String? verificationTestCode, VerificationFailure? verificationFailure, SubmissionAction submissionAction, SubmissionFailure? submissionFailure, MemberSignupDraft member, ProSignupDraft pro
 });
 
 
@@ -1148,7 +1152,7 @@ class __$SignupFlowStateCopyWithImpl<$Res>
 
 /// Create a copy of SignupFlowState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? role = freezed,Object? name = null,Object? phoneNumber = null,Object? verificationCode = null,Object? verificationRemaining = null,Object? verificationAction = null,Object? verificationTestCode = freezed,Object? verificationFailure = freezed,Object? member = null,Object? pro = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? role = freezed,Object? name = null,Object? phoneNumber = null,Object? verificationCode = null,Object? verificationRemaining = null,Object? verificationAction = null,Object? verificationTestCode = freezed,Object? verificationFailure = freezed,Object? submissionAction = null,Object? submissionFailure = freezed,Object? member = null,Object? pro = null,}) {
   return _then(_SignupFlowState(
 role: freezed == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as SignupRole?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -1158,7 +1162,9 @@ as String,verificationRemaining: null == verificationRemaining ? _self.verificat
 as Duration,verificationAction: null == verificationAction ? _self.verificationAction : verificationAction // ignore: cast_nullable_to_non_nullable
 as VerificationAction,verificationTestCode: freezed == verificationTestCode ? _self.verificationTestCode : verificationTestCode // ignore: cast_nullable_to_non_nullable
 as String?,verificationFailure: freezed == verificationFailure ? _self.verificationFailure : verificationFailure // ignore: cast_nullable_to_non_nullable
-as VerificationFailure?,member: null == member ? _self.member : member // ignore: cast_nullable_to_non_nullable
+as VerificationFailure?,submissionAction: null == submissionAction ? _self.submissionAction : submissionAction // ignore: cast_nullable_to_non_nullable
+as SubmissionAction,submissionFailure: freezed == submissionFailure ? _self.submissionFailure : submissionFailure // ignore: cast_nullable_to_non_nullable
+as SubmissionFailure?,member: null == member ? _self.member : member // ignore: cast_nullable_to_non_nullable
 as MemberSignupDraft,pro: null == pro ? _self.pro : pro // ignore: cast_nullable_to_non_nullable
 as ProSignupDraft,
   ));

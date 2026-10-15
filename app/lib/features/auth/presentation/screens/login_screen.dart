@@ -5,6 +5,9 @@ import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
 import 'package:swingmate/core/theme/app_assets.dart';
 import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
+import 'package:swingmate/features/auth/domain/entities/social_provider.dart';
+import 'package:swingmate/features/auth/presentation/helpers/signup_messages.dart';
+import 'package:swingmate/features/auth/presentation/states/signup_flow_state.dart';
 import 'package:swingmate/features/auth/presentation/widgets/login_logo_placeholder.dart';
 import 'package:swingmate/features/auth/presentation/widgets/social_login_button.dart';
 
@@ -38,7 +41,8 @@ class LoginScreen extends ConsumerWidget {
                         iconIsSvg: true,
                         backgroundColor: AppColors.kakao,
                         foregroundColor: AppColors.kakaoForeground,
-                        onPressed: () => _showRoleSelection(context, ref),
+                        onPressed: () =>
+                            _signIn(context, ref, SocialProvider.kakao),
                       ),
                       const SizedBox(height: 16),
                       SocialLoginButton(
@@ -50,7 +54,8 @@ class LoginScreen extends ConsumerWidget {
                         borderColor: AppColors.borderSubtle,
                         shadowBlurRadius: 8,
                         fontWeight: FontWeight.w500,
-                        onPressed: () => _showRoleSelection(context, ref),
+                        onPressed: () =>
+                            _signIn(context, ref, SocialProvider.google),
                       ),
                       const SizedBox(height: 16),
                       TextButton(
@@ -87,7 +92,30 @@ void _showComingSoon(BuildContext context, String feature) {
     ..showSnackBar(SnackBar(content: Text('$feature 기능은 다음 단계에서 연결합니다.')));
 }
 
-void _showRoleSelection(BuildContext context, WidgetRef ref) {
-  ref.read(signupFlowViewModelProvider.notifier).reset();
-  context.pushNamed(AppRoutes.roleSelectionName);
+Future<void> _signIn(
+  BuildContext context,
+  WidgetRef ref,
+  SocialProvider provider,
+) async {
+  final viewModel = ref.read(signupFlowViewModelProvider.notifier);
+  final result = await viewModel.signInWithSocial(provider);
+  if (!context.mounted) return;
+
+  if (result == null) {
+    final failure = ref.read(signupFlowViewModelProvider).submissionFailure;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(failure?.message ?? SubmissionFailure.unknown.message),
+        ),
+      );
+    return;
+  }
+
+  if (result.isOnboardingCompleted) {
+    context.goNamed(AppRoutes.homeName);
+  } else {
+    context.pushNamed(AppRoutes.roleSelectionName);
+  }
 }

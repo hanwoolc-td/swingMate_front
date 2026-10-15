@@ -1,0 +1,1 @@
+enum SocialProvider { kakao, google }

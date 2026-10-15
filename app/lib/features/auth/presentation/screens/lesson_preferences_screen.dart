@@ -5,6 +5,7 @@ import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
 import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
 import 'package:swingmate/features/auth/presentation/helpers/signup_messages.dart';
+import 'package:swingmate/features/auth/presentation/states/signup_flow_state.dart';
 import 'package:swingmate/features/auth/presentation/widgets/golf_experience_option.dart';
 import 'package:swingmate/features/auth/presentation/widgets/lesson_interest_chip.dart';
 import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.dart';
@@ -198,7 +199,7 @@ class _LessonPreferencesScreenState
     context.goNamed(AppRoutes.phoneVerificationName);
   }
 
-  void _continue() {
+  Future<void> _continue() async {
     final validationError = ref
         .read(signupFlowViewModelProvider.notifier)
         .validateLessonPreferences();
@@ -212,6 +213,20 @@ class _LessonPreferencesScreenState
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..clearSnackBars();
+    final isCompleted = await ref
+        .read(signupFlowViewModelProvider.notifier)
+        .completeMemberSignup();
+    if (!mounted) return;
+
+    if (!isCompleted) {
+      final failure = ref.read(signupFlowViewModelProvider).submissionFailure;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(failure?.message ?? SubmissionFailure.unknown.message),
+        ),
+      );
+      return;
+    }
     context.pushNamed(AppRoutes.proCodeConnectionName);
   }
 }

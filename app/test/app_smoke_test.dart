@@ -12,13 +12,23 @@ import 'package:swingmate/features/auth/presentation/screens/phone_verification_
 import 'package:swingmate/features/auth/presentation/screens/pro_profile_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/pro_career_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/pro_availability_screen.dart';
+import 'package:swingmate/features/auth/di/providers/auth_providers.dart';
 import 'package:swingmate/features/home/di/providers/home_providers.dart';
 import 'package:swingmate/features/home/domain/entities/home_dashboard.dart';
 import 'package:swingmate/features/home/domain/repositories/home_repository.dart';
 
+import 'support/fake_auth_repository.dart';
+
 void main() {
   testWidgets('Figma 로그인 화면과 로고 자리를 표시한다', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: SwingMateApp()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+        ],
+        child: const SwingMateApp(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.byType(LoginLogoPlaceholder), findsOneWidget);
@@ -29,7 +39,14 @@ void main() {
   });
 
   testWidgets('소셜 로그인 버튼에서 역할 선택 화면으로 이동한다', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: SwingMateApp()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+        ],
+        child: const SwingMateApp(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('카카오 로그인'));
@@ -118,7 +135,14 @@ void main() {
   });
 
   testWidgets('프로 경력 화면의 안내 문구를 표시한다', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: SwingMateApp()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+        ],
+        child: const SwingMateApp(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     final context = tester.element(find.byType(SwingMateApp));
@@ -133,7 +157,14 @@ void main() {
   });
 
   testWidgets('프로 경력 소개 화면을 표시하고 경력을 추가한다', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: SwingMateApp()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+        ],
+        child: const SwingMateApp(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     final context = tester.element(find.byType(SwingMateApp));
@@ -167,7 +198,14 @@ void main() {
   });
 
   testWidgets('프로 소개 화면에서 정보를 입력하고 인증 화면으로 이동한다', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: SwingMateApp()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+        ],
+        child: const SwingMateApp(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     final context = tester.element(find.byType(SwingMateApp));
@@ -199,7 +237,14 @@ void main() {
   });
 
   testWidgets('회원 프로필 입력은 역할 선택 화면에 다녀와도 유지된다', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: SwingMateApp()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+        ],
+        child: const SwingMateApp(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     final context = tester.element(find.byType(SwingMateApp));
@@ -223,7 +268,14 @@ void main() {
   });
 
   testWidgets('프로 예약 가능 시간의 공통 및 요일별 설정 형식을 전환한다', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: SwingMateApp()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+        ],
+        child: const SwingMateApp(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     final context = tester.element(find.byType(SwingMateApp));

@@ -244,7 +244,7 @@ class _ProAvailabilityScreenState extends ConsumerState<ProAvailabilityScreen> {
     context.goNamed(AppRoutes.proCareerName);
   }
 
-  void _continue() {
+  Future<void> _continue() async {
     _syncAvailabilityState();
     final validationError = ref
         .read(signupFlowViewModelProvider.notifier)
@@ -255,11 +255,22 @@ class _ProAvailabilityScreenState extends ConsumerState<ProAvailabilityScreen> {
         ..showSnackBar(SnackBar(content: Text(validationError.message)));
       return;
     }
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(content: Text('프로 가입 완료 단계는 다음 작업에서 연결합니다.')),
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    final isCompleted = await ref
+        .read(signupFlowViewModelProvider.notifier)
+        .completeProSignup();
+    if (!mounted) return;
+
+    if (!isCompleted) {
+      final failure = ref.read(signupFlowViewModelProvider).submissionFailure;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(failure?.message ?? SubmissionFailure.unknown.message),
+        ),
       );
+      return;
+    }
+    context.goNamed(AppRoutes.homeName);
   }
 }
 

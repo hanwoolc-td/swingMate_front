@@ -2,8 +2,12 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:swingmate/features/auth/di/providers/auth_providers.dart';
+import 'package:swingmate/features/auth/domain/entities/auth_exception.dart';
+import 'package:swingmate/features/auth/domain/entities/social_provider.dart';
+import 'package:swingmate/features/auth/domain/entities/social_sign_in_result.dart';
 import 'package:swingmate/features/auth/domain/entities/verification_code_delivery.dart';
 import 'package:swingmate/features/auth/presentation/helpers/signup_messages.dart';
+import 'package:swingmate/features/auth/presentation/helpers/signup_registration_mapper.dart';
 import 'package:swingmate/features/auth/presentation/states/signup_flow_state.dart';
 
 class SignupFlowViewModel extends Notifier<SignupFlowState> {
@@ -15,6 +19,91 @@ class SignupFlowViewModel extends Notifier<SignupFlowState> {
   SignupFlowState build() {
     ref.onDispose(() => _verificationTimer?.cancel());
     return const SignupFlowState();
+  }
+
+  /// 소셜 로그인 후 가입 여부를 알려준다. 실패하면 `null`이고 [SignupFlowState.submissionFailure]에 사유가 남는다.
+  Future<SocialSignInResult?> signInWithSocial(SocialProvider provider) async {
+    if (state.submissionAction != SubmissionAction.idle) return null;
+
+    reset();
+    state = state.copyWith(submissionAction: SubmissionAction.signingIn);
+    try {
+      final token = await ref
+          .read(socialCredentialSourceProvider)
+          .fetchToken(provider);
+      final result = await ref
+          .read(authRepositoryProvider)
+          .signInWithSocial(provider: provider, token: token);
+      state = state.copyWith(submissionAction: SubmissionAction.idle);
+      return result;
+    } catch (error) {
+      state = state.copyWith(
+        submissionAction: SubmissionAction.idle,
+        submissionFailure: _submissionFailureOf(error),
+      );
+      return null;
+    }
+  }
+
+  /// 일반 회원 가입을 마친다. 성공하면 `true`.
+  Future<bool> completeMemberSignup() async {
+    final registration = SignupRegistrationMapper.member(state);
+    if (registration == null) {
+      state = state.copyWith(submissionFailure: SubmissionFailure.invalidInput);
+      return false;
+    }
+    return _complete(
+      () => ref.read(authRepositoryProvider).completeMemberSignup(registration),
+    );
+  }
+
+  /// 프로 가입을 마친다. 성공하면 `true`.
+  Future<bool> completeProSignup() {
+    final registration = SignupRegistrationMapper.pro(state);
+    return _complete(
+      () => ref.read(authRepositoryProvider).completeProSignup(registration),
+    );
+  }
+
+  Future<bool> _complete(Future<Object?> Function() request) async {
+    if (state.submissionAction != SubmissionAction.idle) return false;
+
+    final generation = ++_requestGeneration;
+    state = state.copyWith(
+      submissionAction: SubmissionAction.completing,
+      submissionFailure: null,
+    );
+    try {
+      await request();
+      if (generation != _requestGeneration) return false;
+      state = state.copyWith(submissionAction: SubmissionAction.idle);
+      return true;
+    } catch (error) {
+      if (generation != _requestGeneration) return false;
+      state = state.copyWith(
+        submissionAction: SubmissionAction.idle,
+        submissionFailure: _submissionFailureOf(error),
+      );
+      return false;
+    }
+  }
+
+  SubmissionFailure _submissionFailureOf(Object error) {
+    if (error is! AuthException) return SubmissionFailure.unknown;
+    return switch (error.reason) {
+      AuthFailureReason.network => SubmissionFailure.network,
+      AuthFailureReason.invalidSocialToken =>
+        SubmissionFailure.invalidSocialToken,
+      AuthFailureReason.socialProviderUnavailable =>
+        SubmissionFailure.providerUnavailable,
+      AuthFailureReason.phoneAlreadyInUse =>
+        SubmissionFailure.phoneAlreadyInUse,
+      AuthFailureReason.verificationExpired ||
+      AuthFailureReason.verificationAttemptsExceeded =>
+        SubmissionFailure.verificationExpired,
+      AuthFailureReason.invalidInput => SubmissionFailure.invalidInput,
+      _ => SubmissionFailure.unknown,
+    };
   }
 
   void reset() {
@@ -76,11 +165,17 @@ class SignupFlowViewModel extends Notifier<SignupFlowState> {
       );
       _startVerificationTimer();
       return delivery;
-    } catch (_) {
+    } catch (error) {
       if (generation != _requestGeneration) return null;
       state = state.copyWith(
         verificationAction: VerificationAction.idle,
-        verificationFailure: VerificationFailure.requestFailed,
+        verificationFailure: switch (error) {
+          AuthException(reason: AuthFailureReason.phoneAlreadyInUse) =>
+            VerificationFailure.phoneAlreadyInUse,
+          AuthException(reason: AuthFailureReason.sendLimitExceeded) =>
+            VerificationFailure.tooManyRequests,
+          _ => VerificationFailure.requestFailed,
+        },
       );
       return null;
     }
@@ -126,11 +221,19 @@ class SignupFlowViewModel extends Notifier<SignupFlowState> {
         verificationFailure: isValid ? null : VerificationFailure.codeMismatch,
       );
       return isValid;
-    } catch (_) {
+    } catch (error) {
       if (generation != _requestGeneration) return false;
       state = state.copyWith(
         verificationAction: VerificationAction.idle,
-        verificationFailure: VerificationFailure.verificationFailed,
+        verificationFailure: switch (error) {
+          AuthException(reason: AuthFailureReason.verificationExpired) =>
+            VerificationFailure.expired,
+          AuthException(
+            reason: AuthFailureReason.verificationAttemptsExceeded,
+          ) =>
+            VerificationFailure.attemptsExceeded,
+          _ => VerificationFailure.verificationFailed,
+        },
       );
       return false;
     }
