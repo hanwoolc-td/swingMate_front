@@ -32,13 +32,11 @@ class SdkSocialCredentialSource implements SocialCredentialSource {
     }
   }
 
-  /// 카카오톡 앱으로 로그인하고, 설치돼 있지 않으면 카카오 계정 웹 로그인으로 넘어간다.
+  /// 카카오톡이 설치돼 있으면 앱으로, 아니면 카카오 계정 웹 로그인으로 진행한다.
+  /// 설치 여부를 먼저 확인하지 않으면 iOS에서는 설치 안내 웹페이지가 열린다.
   Future<OAuthToken> _loginWithKakaoTalkOrAccount() async {
-    try {
-      return await UserApi.instance.loginWithKakaoTalk();
-    } on KakaoClientException catch (error) {
-      if (error.reason != ClientErrorCause.notSupported) rethrow;
-      return UserApi.instance.loginWithKakaoAccount();
-    }
+    return await isKakaoTalkInstalled()
+        ? UserApi.instance.loginWithKakaoTalk()
+        : UserApi.instance.loginWithKakaoAccount();
   }
 }
