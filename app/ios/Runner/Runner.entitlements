@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Google 로그인이 토큰을 키체인에 저장한다. 서명 없는 시뮬레이터 빌드에서 키체인 오류가 나지 않게 한다. -->
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.forgenovastudio.swingmate</string>
+	</array>
+</dict>
+</plist>

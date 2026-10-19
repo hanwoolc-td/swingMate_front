@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:swingmate/features/auth/domain/entities/auth_exception.dart';
@@ -22,10 +23,12 @@ class SdkSocialCredentialSource implements SocialCredentialSource {
       final account = await GoogleSignIn.instance.authenticate();
       final idToken = account.authentication.idToken;
       if (idToken == null) {
+        debugPrint('Google 로그인 실패: ID 토큰이 비어 있음');
         throw const AuthException(AuthFailureReason.invalidSocialToken);
       }
       return idToken;
     } on GoogleSignInException catch (error) {
+      debugPrint('Google 로그인 실패: ${error.code} ${error.description}');
       throw AuthException(switch (error.code) {
         GoogleSignInExceptionCode.canceled ||
         GoogleSignInExceptionCode.interrupted => AuthFailureReason.cancelled,
