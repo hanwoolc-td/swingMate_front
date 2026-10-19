@@ -341,7 +341,8 @@
 ## 8. 프론트엔드 현 구현과 연동 메모
 
 - 앱은 `API_BASE_URL`(기본 `http://localhost:8080`)의 서버와 통신한다. Android 에뮬레이터에서는 `--dart-define=API_BASE_URL=http://10.0.2.2:8080`을 쓴다.
-- 카카오 로그인은 카카오 Flutter SDK로 연동했다(카카오톡이 있으면 앱으로, 없으면 계정 웹 로그인). 서버는 `KAKAO_APP_ID=1610065`로 실행해야 한다. Google 로그인은 아직 연동하지 않았다.
+- 카카오 로그인은 카카오 Flutter SDK로(카카오톡이 있으면 앱으로, 없으면 계정 웹 로그인), Google 로그인은 `google_sign_in`으로 연동했다. 서버는 `KAKAO_APP_ID=1610065`와 `GOOGLE_CLIENT_IDS`(웹·iOS 클라이언트 ID, 쉼표 구분)를 설정해 실행해야 한다.
+- Google Cloud 콘솔에는 iOS(번들 ID), Android(패키지 이름·SHA-1), 웹 클라이언트를 만들어야 한다. 앱은 웹 클라이언트 ID를 `serverClientId`로 사용해 서버용 ID 토큰을 받는다. Android SHA-1도 개발 컴퓨터의 debug keystore마다 다르다.
 - 카카오 콘솔에는 Android 패키지 이름·키 해시와 iOS 번들 ID(`com.forgenovastudio.swingmate`)를 등록해야 한다. 키 해시는 개발 컴퓨터의 debug keystore마다 다르다.
 - 카카오 없이 개발하려면 앱을 `--dart-define=DEV_SOCIAL_LOGIN=true`로 실행하고 서버를 `OAUTH_MOCK_ENABLED=true`로 켠다. 이때 임의 토큰(`kakao-dev-user` 등, `--dart-define=DEV_SOCIAL_ID`로 변경)으로 로그인된다. 운영 환경에서는 무시된다.
 - 연동된 API: 소셜 로그인, SMS 인증 발송·확인, 일반 회원·프로 가입 완료. 서버의 테스트 인증번호는 `123456`이며 응답/화면에 노출하지 않는다.
