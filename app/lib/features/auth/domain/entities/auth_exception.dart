@@ -1,5 +1,6 @@
 enum AuthFailureReason {
   invalidSocialToken,
+  cancelled,
   socialProviderUnavailable,
   phoneAlreadyInUse,
   verificationCodeInvalid,

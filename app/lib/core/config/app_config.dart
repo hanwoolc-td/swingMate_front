@@ -3,7 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 enum AppEnvironment { development, production }
 
 class AppConfig {
-  const AppConfig({required this.environment, required this.apiBaseUrl});
+  const AppConfig({
+    required this.environment,
+    required this.apiBaseUrl,
+    this.kakaoNativeAppKey = defaultKakaoNativeAppKey,
+    this.useDevSocialLogin = false,
+  });
+
+  /// 카카오 개발자 콘솔의 네이티브 앱 키. 앱 안에 들어가는 공개 값이다.
+  /// Android 매니페스트와 iOS Info.plist의 `kakao<키>` URL 스킴도 같은 키를 쓴다.
+  static const defaultKakaoNativeAppKey = '80bf73518a4fbbc2e085b62c6bd3726e';
 
   factory AppConfig.fromEnvironment() {
     const environmentName = String.fromEnvironment(
@@ -15,7 +24,15 @@ class AppConfig {
       defaultValue: 'http://localhost:8080',
     );
 
+    const useDevSocialLogin = bool.fromEnvironment('DEV_SOCIAL_LOGIN');
+    const kakaoNativeAppKey = String.fromEnvironment(
+      'KAKAO_NATIVE_APP_KEY',
+      defaultValue: defaultKakaoNativeAppKey,
+    );
+
     return AppConfig(
+      kakaoNativeAppKey: kakaoNativeAppKey,
+      useDevSocialLogin: useDevSocialLogin,
       environment: switch (environmentName) {
         'production' => AppEnvironment.production,
         _ => AppEnvironment.development,
@@ -26,6 +43,11 @@ class AppConfig {
 
   final AppEnvironment environment;
   final String apiBaseUrl;
+  final String kakaoNativeAppKey;
+
+  /// `--dart-define=DEV_SOCIAL_LOGIN=true`: 카카오·Google 대신 임의 토큰으로 로그인한다.
+  /// 서버를 `OAUTH_MOCK_ENABLED=true`로 켰을 때만 동작하며 운영 환경에서는 무시한다.
+  final bool useDevSocialLogin;
 
   bool get isProduction => environment == AppEnvironment.production;
 

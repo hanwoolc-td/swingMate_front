@@ -20,6 +20,7 @@ enum SubmissionAction { idle, signingIn, completing }
 
 enum SubmissionFailure {
   network,
+  cancelled,
   invalidSocialToken,
   providerUnavailable,
   phoneAlreadyInUse,

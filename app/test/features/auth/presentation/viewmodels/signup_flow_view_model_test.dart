@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:swingmate/features/auth/data/repositories/dev_social_credential_source.dart';
 import 'package:swingmate/features/auth/di/providers/auth_providers.dart';
 import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
 import 'package:swingmate/features/auth/domain/entities/auth_exception.dart';
@@ -182,6 +183,25 @@ void main() {
       );
     });
 
+    test('treats a cancelled social login as a cancellation', () async {
+      final container = _createContainer(
+        FakeAuthRepository(
+          error: const AuthException(AuthFailureReason.cancelled),
+        ),
+      );
+      addTearDown(container.dispose);
+
+      final result = await container
+          .read(signupFlowViewModelProvider.notifier)
+          .signInWithSocial(SocialProvider.kakao);
+
+      expect(result, isNull);
+      expect(
+        container.read(signupFlowViewModelProvider).submissionFailure,
+        SubmissionFailure.cancelled,
+      );
+    });
+
     test('submits member signup with domain values', () async {
       final repository = FakeAuthRepository();
       final container = _createContainer(repository);
@@ -312,6 +332,11 @@ void main() {
 
 ProviderContainer _createContainer(AuthRepository repository) {
   return ProviderContainer(
-    overrides: [authRepositoryProvider.overrideWithValue(repository)],
+    overrides: [
+      authRepositoryProvider.overrideWithValue(repository),
+      socialCredentialSourceProvider.overrideWithValue(
+        const DevSocialCredentialSource(),
+      ),
+    ],
   );
 }

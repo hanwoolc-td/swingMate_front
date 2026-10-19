@@ -92,6 +92,7 @@ class SignupFlowViewModel extends Notifier<SignupFlowState> {
     if (error is! AuthException) return SubmissionFailure.unknown;
     return switch (error.reason) {
       AuthFailureReason.network => SubmissionFailure.network,
+      AuthFailureReason.cancelled => SubmissionFailure.cancelled,
       AuthFailureReason.invalidSocialToken =>
         SubmissionFailure.invalidSocialToken,
       AuthFailureReason.socialProviderUnavailable =>

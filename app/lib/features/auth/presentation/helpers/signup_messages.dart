@@ -49,6 +49,7 @@ extension VerificationFailureMessage on VerificationFailure {
 extension SubmissionFailureMessage on SubmissionFailure {
   String get message => switch (this) {
     SubmissionFailure.network => '서버에 연결하지 못했습니다. 네트워크를 확인해주세요.',
+    SubmissionFailure.cancelled => '로그인이 취소되었습니다.',
     SubmissionFailure.invalidSocialToken => '로그인 정보를 확인하지 못했습니다. 다시 시도해주세요.',
     SubmissionFailure.providerUnavailable =>
       '소셜 로그인 서비스에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.',

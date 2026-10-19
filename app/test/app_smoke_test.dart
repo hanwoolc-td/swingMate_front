@@ -12,6 +12,7 @@ import 'package:swingmate/features/auth/presentation/screens/phone_verification_
 import 'package:swingmate/features/auth/presentation/screens/pro_profile_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/pro_career_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/pro_availability_screen.dart';
+import 'package:swingmate/features/auth/data/repositories/dev_social_credential_source.dart';
 import 'package:swingmate/features/auth/di/providers/auth_providers.dart';
 import 'package:swingmate/features/home/di/providers/home_providers.dart';
 import 'package:swingmate/features/home/domain/entities/home_dashboard.dart';
@@ -25,6 +26,9 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+          socialCredentialSourceProvider.overrideWithValue(
+            const DevSocialCredentialSource(),
+          ),
         ],
         child: const SwingMateApp(),
       ),
@@ -43,6 +47,9 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+          socialCredentialSourceProvider.overrideWithValue(
+            const DevSocialCredentialSource(),
+          ),
         ],
         child: const SwingMateApp(),
       ),
@@ -139,6 +146,9 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+          socialCredentialSourceProvider.overrideWithValue(
+            const DevSocialCredentialSource(),
+          ),
         ],
         child: const SwingMateApp(),
       ),
@@ -161,6 +171,9 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+          socialCredentialSourceProvider.overrideWithValue(
+            const DevSocialCredentialSource(),
+          ),
         ],
         child: const SwingMateApp(),
       ),
@@ -202,6 +215,9 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+          socialCredentialSourceProvider.overrideWithValue(
+            const DevSocialCredentialSource(),
+          ),
         ],
         child: const SwingMateApp(),
       ),
@@ -241,6 +257,9 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+          socialCredentialSourceProvider.overrideWithValue(
+            const DevSocialCredentialSource(),
+          ),
         ],
         child: const SwingMateApp(),
       ),
@@ -272,6 +291,9 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+          socialCredentialSourceProvider.overrideWithValue(
+            const DevSocialCredentialSource(),
+          ),
         ],
         child: const SwingMateApp(),
       ),

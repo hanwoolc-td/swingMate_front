@@ -341,7 +341,9 @@
 ## 8. 프론트엔드 현 구현과 연동 메모
 
 - 앱은 `API_BASE_URL`(기본 `http://localhost:8080`)의 서버와 통신한다. Android 에뮬레이터에서는 `--dart-define=API_BASE_URL=http://10.0.2.2:8080`을 쓴다.
-- 소셜 로그인 SDK(카카오·Google)는 아직 붙지 않았다. 개발 환경에서는 임의 토큰(`kakao-dev-user` 등, `--dart-define=DEV_SOCIAL_ID`로 변경)을 보내며, 서버를 `OAUTH_MOCK_ENABLED=true`로 켰을 때만 로그인된다. 운영 환경에서는 로그인이 막힌다.
+- 카카오 로그인은 카카오 Flutter SDK로 연동했다(카카오톡이 있으면 앱으로, 없으면 계정 웹 로그인). 서버는 `KAKAO_APP_ID=1610065`로 실행해야 한다. Google 로그인은 아직 연동하지 않았다.
+- 카카오 콘솔에는 Android 패키지 이름·키 해시와 iOS 번들 ID(`com.forgenovastudio.swingmate`)를 등록해야 한다. 키 해시는 개발 컴퓨터의 debug keystore마다 다르다.
+- 카카오 없이 개발하려면 앱을 `--dart-define=DEV_SOCIAL_LOGIN=true`로 실행하고 서버를 `OAUTH_MOCK_ENABLED=true`로 켠다. 이때 임의 토큰(`kakao-dev-user` 등, `--dart-define=DEV_SOCIAL_ID`로 변경)으로 로그인된다. 운영 환경에서는 무시된다.
 - 연동된 API: 소셜 로그인, SMS 인증 발송·확인, 일반 회원·프로 가입 완료. 서버의 테스트 인증번호는 `123456`이며 응답/화면에 노출하지 않는다.
 - 아직 연동하지 않은 것: 역할 선택 API(가입 완료 API가 역할을 함께 저장), 회원-프로 연결(앱 화면은 아직 "회원이 프로 코드 입력" 방식이라 CONNECT-01에 맞게 다시 만들어야 함), 토큰 갱신·로그아웃, 앱 재실행 시 `GET /users/me`.
 - 토큰은 메모리에만 보관해 앱을 다시 켜면 로그인해야 한다.
