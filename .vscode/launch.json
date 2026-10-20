@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "SwingMate Dev (iOS Simulator)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "${workspaceFolder}/app",
+      "program": "${workspaceFolder}/app/lib/main.dart",
+      "args": [
+        "--dart-define=APP_ENV=development",
+        "--dart-define=API_BASE_URL=http://localhost:8080",
+        "--dart-define=DEV_SOCIAL_LOGIN=true"
+      ]
+    },
+    {
+      "name": "SwingMate Dev (iOS Simulator · Real Login)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "${workspaceFolder}/app",
+      "program": "${workspaceFolder}/app/lib/main.dart",
+      "args": [
+        "--dart-define=APP_ENV=development",
+        "--dart-define=API_BASE_URL=http://localhost:8080"
+      ]
+    }
+  ]
+}
