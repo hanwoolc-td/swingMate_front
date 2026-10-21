@@ -5,115 +5,140 @@ import 'package:swingmate/app/theme/app_colors.dart';
 class VerificationCodeInput extends StatefulWidget {
   const VerificationCodeInput({
     required this.controller,
+    this.errorText,
     this.onCompleted,
+    this.onChanged,
     super.key,
   });
 
   final TextEditingController controller;
+  final String? errorText;
   final VoidCallback? onCompleted;
+  final ValueChanged<String>? onChanged;
 
   @override
   State<VerificationCodeInput> createState() => _VerificationCodeInputState();
 }
 
-class _VerificationCodeInputState extends State<VerificationCodeInput> {
-  late final List<TextEditingController> _digitControllers;
-  late final List<FocusNode> _focusNodes;
+class _VerificationCodeInputState extends State<VerificationCodeInput>
+    with SingleTickerProviderStateMixin {
+  late final FocusNode _focusNode;
+  late final AnimationController _errorAnimationController;
+  late final Animation<double> _errorOffsetAnimation;
+  late var _previousCodeLength = widget.controller.text.length;
 
   @override
   void initState() {
     super.initState();
-    _digitControllers = List.generate(6, (_) => TextEditingController());
-    _focusNodes = List.generate(6, (_) => FocusNode());
+    _focusNode = FocusNode();
+    _errorAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 360),
+      vsync: this,
+    );
+    _errorOffsetAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 0.0, end: -6.0),
+        weight: 25,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: -6.0, end: 6.0),
+        weight: 35,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 6.0, end: 0.0),
+        weight: 40,
+      ),
+    ]).animate(_errorAnimationController);
+  }
+
+  @override
+  void didUpdateWidget(covariant VerificationCodeInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.errorText == null && widget.errorText != null) {
+      _errorAnimationController.forward(from: 0);
+    }
   }
 
   @override
   void dispose() {
-    for (final controller in _digitControllers) {
-      controller.dispose();
-    }
-    for (final focusNode in _focusNodes) {
-      focusNode.dispose();
-    }
+    _focusNode.dispose();
+    _errorAnimationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 50,
-      child: Row(
-        children: List.generate(
-          6,
-          (index) => Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(right: index == 5 ? 0 : 8),
-              child: Semantics(
-                textField: true,
-                label: '인증번호 ${index + 1}번째 자리',
-                child: TextField(
-                  controller: _digitControllers[index],
-                  focusNode: _focusNodes[index],
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  textInputAction: index == 5
-                      ? TextInputAction.done
-                      : TextInputAction.next,
-                  maxLength: 1,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  style: const TextStyle(
-                    color: AppColors.ink,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  decoration: InputDecoration(
-                    counterText: '',
-                    filled: true,
-                    fillColor: AppColors.roleCardBackground,
-                    contentPadding: EdgeInsets.zero,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
-                        color: AppColors.borderSubtle,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
-                        color: AppColors.borderSubtle,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: AppColors.ink),
-                    ),
-                  ),
-                  onChanged: (value) => _handleChanged(index, value),
-                ),
+    final isError = widget.errorText != null;
+    final borderColor = isError ? AppColors.required : AppColors.borderSubtle;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AnimatedBuilder(
+          animation: _errorOffsetAnimation,
+          builder: (context, child) => Transform.translate(
+            offset: Offset(_errorOffsetAnimation.value, 0),
+            child: child,
+          ),
+          child: TextField(
+            controller: widget.controller,
+            focusNode: _focusNode,
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.done,
+            maxLength: 6,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            onChanged: _handleChanged,
+            style: const TextStyle(
+              color: AppColors.ink,
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 4,
+            ),
+            decoration: InputDecoration(
+              counterText: '',
+              hintText: '인증번호 6자리',
+              hintStyle: const TextStyle(
+                color: AppColors.secondaryText,
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 0,
+              ),
+              filled: true,
+              fillColor: AppColors.selectionCardBackground,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              border: _border(borderColor),
+              enabledBorder: _border(borderColor),
+              focusedBorder: _border(
+                isError ? AppColors.required : AppColors.ink,
               ),
             ),
           ),
         ),
-      ),
+        if (isError) ...[
+          const SizedBox(height: 12),
+          Text(
+            widget.errorText!,
+            style: const TextStyle(
+              color: AppColors.required,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ],
     );
   }
 
-  void _handleChanged(int index, String value) {
-    if (value.isNotEmpty && index < _focusNodes.length - 1) {
-      _focusNodes[index + 1].requestFocus();
-    }
+  OutlineInputBorder _border(Color color) => OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: BorderSide(color: color),
+  );
 
-    if (value.isEmpty && index > 0) {
-      _focusNodes[index - 1].requestFocus();
-    }
+  void _handleChanged(String value) {
+    final previousLength = _previousCodeLength;
+    _previousCodeLength = value.length;
+    widget.onChanged?.call(value);
 
-    final code = _digitControllers.map((controller) => controller.text).join();
-    widget.controller.value = TextEditingValue(
-      text: code,
-      selection: TextSelection.collapsed(offset: code.length),
-    );
-
-    if (_digitControllers.every((controller) => controller.text.isNotEmpty)) {
+    if (previousLength < 6 && value.length == 6) {
       widget.onCompleted?.call();
     }
   }

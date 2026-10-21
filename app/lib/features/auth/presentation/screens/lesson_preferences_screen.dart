@@ -4,10 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
 import 'package:swingmate/features/auth/di/providers/signup_flow_providers.dart';
-import 'package:swingmate/features/auth/presentation/helpers/signup_messages.dart';
 import 'package:swingmate/features/auth/presentation/states/signup_flow_state.dart';
 import 'package:swingmate/features/auth/presentation/widgets/golf_experience_option.dart';
-import 'package:swingmate/features/auth/presentation/widgets/lesson_interest_chip.dart';
 import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.dart';
 
 class LessonPreferencesScreen extends ConsumerStatefulWidget {
@@ -20,25 +18,33 @@ class LessonPreferencesScreen extends ConsumerStatefulWidget {
 
 class _LessonPreferencesScreenState
     extends ConsumerState<LessonPreferencesScreen> {
-  static const _interests = [
-    '초보',
-    '스윙 교정',
-    '숏게임',
-    '드라이버',
-    '아이언',
-    '퍼팅',
-    '로프트샷',
-    '스팅어샷',
-    '기타',
+  static const _experiences = [
+    '아직 시작 전',
+    '6개월 미만',
+    '6개월 ~ 1년',
+    '1 ~ 3년',
+    '3 ~ 7년',
+    '7년 이상',
   ];
 
-  static const _experiences = ['6개월 미만', '6개월 ~ 3년', '3년 ~ 7년', '7년 이상'];
+  static const _scores = [
+    '라운드 경험 없음',
+    '120타 이상',
+    '100 ~ 119타',
+    '90 ~ 99타',
+    '80 ~ 89타',
+    '79타 이하',
+  ];
+
+  String? _selectedScore;
 
   @override
   Widget build(BuildContext context) {
     final memberDraft = ref.watch(
       signupFlowViewModelProvider.select((state) => state.member),
     );
+    final canContinue =
+        memberDraft.selectedExperience != null && _selectedScore != null;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -57,7 +63,7 @@ class _LessonPreferencesScreenState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          '프로에게 무엇을\n배우고 싶나요?',
+                          '골프를 시작한지 얼마나 되셨나요?',
                           style: TextStyle(
                             color: AppColors.ink,
                             fontSize: 24,
@@ -67,7 +73,7 @@ class _LessonPreferencesScreenState
                         ),
                         const SizedBox(height: 8),
                         const Text(
-                          '프로가 레슨할때 참고할 정보예요.',
+                          '회원님에게 맞는 레슨을 준비하는 데 활용돼요.',
                           style: TextStyle(
                             color: AppColors.secondaryText,
                             fontSize: 18,
@@ -75,9 +81,9 @@ class _LessonPreferencesScreenState
                           ),
                         ),
                         const SizedBox(height: 48),
-                        _buildInterestSection(memberDraft.selectedInterests),
-                        const SizedBox(height: 32),
                         _buildExperienceSection(memberDraft.selectedExperience),
+                        const SizedBox(height: 48),
+                        _buildScoreSection(),
                       ],
                     ),
                   ),
@@ -88,10 +94,12 @@ class _LessonPreferencesScreenState
                     width: double.infinity,
                     height: 48,
                     child: FilledButton(
-                      onPressed: _continue,
+                      onPressed: canContinue ? _continue : null,
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.action,
                         foregroundColor: AppColors.surface,
+                        disabledBackgroundColor: AppColors.border,
+                        disabledForegroundColor: AppColors.navigationInactive,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -112,51 +120,25 @@ class _LessonPreferencesScreenState
     );
   }
 
-  Widget _buildInterestSection(Set<String> selectedInterests) {
+  Widget _buildScoreSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(
-                text: '관심 레슨 분야 ',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
-              TextSpan(
-                text: '(복수 선택 가능)',
-                style: TextStyle(
-                  color: AppColors.secondaryText,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
+        const Text(
+          '평균 스코어 (18홀 기준)',
+          style: TextStyle(
+            color: AppColors.ink,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
           ),
-          style: TextStyle(color: AppColors.ink, fontSize: 18),
         ),
         const SizedBox(height: 16),
-        Column(
-          children: [
-            for (var row = 0; row < 3; row++) ...[
-              if (row > 0) const SizedBox(height: 8),
-              Row(
-                children: [
-                  for (var column = 0; column < 3; column++) ...[
-                    if (column > 0) const SizedBox(width: 12),
-                    LessonInterestChip(
-                      label: _interests[row * 3 + column],
-                      isSelected: selectedInterests.contains(
-                        _interests[row * 3 + column],
-                      ),
-                      onTap: () =>
-                          _toggleInterest(_interests[row * 3 + column]),
-                    ),
-                  ],
-                ],
-              ),
-            ],
-          ],
-        ),
+        for (final score in _scores)
+          GolfExperienceOption(
+            label: score,
+            isSelected: _selectedScore == score,
+            onTap: () => setState(() => _selectedScore = score),
+          ),
       ],
     );
   }
@@ -173,7 +155,7 @@ class _LessonPreferencesScreenState
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 16),
         for (final experience in _experiences)
           GolfExperienceOption(
             label: experience,
@@ -186,10 +168,6 @@ class _LessonPreferencesScreenState
     );
   }
 
-  void _toggleInterest(String interest) {
-    ref.read(signupFlowViewModelProvider.notifier).toggleInterest(interest);
-  }
-
   void _goBack() {
     if (context.canPop()) {
       context.pop();
@@ -200,33 +178,6 @@ class _LessonPreferencesScreenState
   }
 
   Future<void> _continue() async {
-    final validationError = ref
-        .read(signupFlowViewModelProvider.notifier)
-        .validateLessonPreferences();
-    if (validationError != null) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(validationError.message)));
-      return;
-    }
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..clearSnackBars();
-    final isCompleted = await ref
-        .read(signupFlowViewModelProvider.notifier)
-        .completeMemberSignup();
-    if (!mounted) return;
-
-    if (!isCompleted) {
-      final failure = ref.read(signupFlowViewModelProvider).submissionFailure;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(failure?.message ?? SubmissionFailure.unknown.message),
-        ),
-      );
-      return;
-    }
-    context.pushNamed(AppRoutes.proCodeConnectionName);
+    context.pushNamed(AppRoutes.lessonInterestsName);
   }
 }

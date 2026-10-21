@@ -2,15 +2,16 @@ import 'package:go_router/go_router.dart';
 import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/features/auth/presentation/screens/login_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/lesson_preferences_screen.dart';
-import 'package:swingmate/features/auth/presentation/screens/member_profile_screen.dart';
+import 'package:swingmate/features/auth/presentation/screens/lesson_interests_screen.dart';
+import 'package:swingmate/features/auth/presentation/screens/basic_profile_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/phone_verification_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/pro_code_connection_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/pro_connection_success_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/pro_connection_failure_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/role_selection_screen.dart';
-import 'package:swingmate/features/auth/presentation/screens/pro_profile_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/pro_career_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/pro_availability_screen.dart';
+import 'package:swingmate/features/auth/presentation/states/signup_flow_state.dart';
 import 'package:swingmate/features/home/presentation/screens/home_screen.dart';
 import 'package:swingmate/features/notification/presentation/screens/notification_screen.dart';
 import 'package:swingmate/features/setup/presentation/setup_page.dart';
@@ -34,7 +35,7 @@ abstract final class AppRouteDefinitions {
     GoRoute(
       path: AppRoutes.proProfilePath,
       name: AppRoutes.proProfileName,
-      builder: (context, state) => const ProProfileScreen(),
+      builder: (context, state) => const BasicProfileScreen(role: SignupRole.pro),
     ),
     GoRoute(
       path: AppRoutes.proCareerPath,
@@ -49,7 +50,7 @@ abstract final class AppRouteDefinitions {
     GoRoute(
       path: AppRoutes.memberProfilePath,
       name: AppRoutes.memberProfileName,
-      builder: (context, state) => const MemberProfileScreen(),
+      builder: (context, state) => const BasicProfileScreen(role: SignupRole.member),
     ),
     GoRoute(
       path: AppRoutes.phoneVerificationPath,
@@ -60,6 +61,11 @@ abstract final class AppRouteDefinitions {
       path: AppRoutes.lessonPreferencesPath,
       name: AppRoutes.lessonPreferencesName,
       builder: (context, state) => const LessonPreferencesScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.lessonInterestsPath,
+      name: AppRoutes.lessonInterestsName,
+      builder: (context, state) => const LessonInterestsScreen(),
     ),
     GoRoute(
       path: AppRoutes.proCodeConnectionPath,

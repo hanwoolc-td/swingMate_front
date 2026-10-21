@@ -36,7 +36,7 @@ extension VerificationFailureMessage on VerificationFailure {
   String get message => switch (this) {
     VerificationFailure.requestFailed => '인증번호를 보내지 못했습니다. 잠시 후 다시 시도해주세요.',
     VerificationFailure.expired => '인증 시간이 만료되었습니다. 인증번호를 다시 요청해주세요.',
-    VerificationFailure.codeMismatch => '인증번호가 일치하지 않습니다.',
+    VerificationFailure.codeMismatch => '인증번호가 일치하지 않아요.',
     VerificationFailure.verificationFailed =>
       '인증번호를 확인하지 못했습니다. 잠시 후 다시 시도해주세요.',
     VerificationFailure.phoneAlreadyInUse => '이미 다른 계정에서 사용 중인 번호입니다.',

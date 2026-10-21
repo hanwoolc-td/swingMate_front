@@ -28,6 +28,10 @@ abstract final class AppRoutes {
       '/onboarding/member-profile/lesson-preferences';
   static const lessonPreferencesName = 'lesson-preferences';
 
+  static const lessonInterestsPath =
+      '/onboarding/member-profile/lesson-interests';
+  static const lessonInterestsName = 'lesson-interests';
+
   static const proCodeConnectionPath =
       '/onboarding/member-profile/pro-code-connection';
   static const proCodeConnectionName = 'pro-code-connection';

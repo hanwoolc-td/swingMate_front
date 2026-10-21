@@ -34,10 +34,12 @@ class GolfExperienceOption extends StatelessWidget {
                   border: Border.all(color: AppColors.controlBorder),
                 ),
                 child: isSelected
-                    ? const Icon(
-                        Icons.check,
-                        size: 12,
-                        color: AppColors.surface,
+                    ? const Center(
+                        child: Icon(
+                          Icons.check,
+                          size: 12,
+                          color: AppColors.surface,
+                        ),
                       )
                     : null,
               ),

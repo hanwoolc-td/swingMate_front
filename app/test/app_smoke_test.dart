@@ -6,10 +6,8 @@ import 'package:swingmate/app/router/app_router.dart';
 import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/core/config/app_config.dart';
 import 'package:swingmate/features/auth/presentation/widgets/login_logo_placeholder.dart';
-import 'package:swingmate/features/auth/presentation/widgets/role_selection_card.dart';
-import 'package:swingmate/features/auth/presentation/screens/member_profile_screen.dart';
+import 'package:swingmate/features/auth/presentation/screens/basic_profile_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/phone_verification_screen.dart';
-import 'package:swingmate/features/auth/presentation/screens/pro_profile_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/pro_career_screen.dart';
 import 'package:swingmate/features/auth/presentation/screens/pro_availability_screen.dart';
 import 'package:swingmate/features/auth/data/repositories/dev_social_credential_source.dart';
@@ -59,14 +57,15 @@ void main() {
     await tester.tap(find.text('카카오 로그인'));
     await tester.pumpAndSettle();
 
-    expect(find.text('회원으로 시작할까요,\n프로로 시작할까요?'), findsOneWidget);
+    expect(find.text('어떤 역할로 시작할까요?'), findsOneWidget);
+    expect(find.text('역할에 맞는 기능을 제공해요.'), findsOneWidget);
     expect(find.text('회원으로 시작하기'), findsOneWidget);
     expect(find.text('프로로 시작하기'), findsOneWidget);
-    expect(find.text('다음'), findsOneWidget);
+    expect(find.text('다음'), findsNothing);
 
-    await tester.tap(find.text('다음'));
+    await tester.tap(find.text('회원으로 시작하기'));
     await tester.pumpAndSettle();
-    expect(find.byType(MemberProfileScreen), findsOneWidget);
+    expect(find.byType(BasicProfileScreen), findsOneWidget);
     expect(find.text('프로에게 자신을\n소개해보세요.'), findsOneWidget);
     expect(find.text('프로필 사진'), findsOneWidget);
     expect(find.text('인증번호 받기'), findsOneWidget);
@@ -86,19 +85,8 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('프로로 시작하기'));
-    await tester.pump();
-    expect(
-      tester
-          .widget<RoleSelectionCard>(
-            find.byKey(const ValueKey('role-selection-pro')),
-          )
-          .selected,
-      isTrue,
-    );
-
-    await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
-    expect(find.byType(ProProfileScreen), findsOneWidget);
+    expect(find.byType(BasicProfileScreen), findsOneWidget);
     expect(find.text('회원들에게 자신을\n소개해보세요.'), findsOneWidget);
     expect(find.text('프로필 사진과 기본 정보를 입력해 주세요.'), findsOneWidget);
     expect(find.text('프로필 사진'), findsOneWidget);
@@ -106,7 +94,7 @@ void main() {
 
     await tester.tap(find.bySemanticsLabel('뒤로 가기'));
     await tester.pumpAndSettle();
-    expect(find.text('회원으로 시작할까요,\n프로로 시작할까요?'), findsOneWidget);
+    expect(find.text('어떤 역할로 시작할까요?'), findsOneWidget);
 
     await tester.tap(find.bySemanticsLabel('뒤로 가기'));
     await tester.pumpAndSettle();
@@ -230,7 +218,7 @@ void main() {
         .goNamed(AppRoutes.proProfileName);
     await tester.pumpAndSettle();
 
-    expect(find.byType(ProProfileScreen), findsOneWidget);
+    expect(find.byType(BasicProfileScreen), findsOneWidget);
     expect(find.text('회원들에게 자신을\n소개해보세요.'), findsOneWidget);
     expect(find.text('프로필 사진과 기본 정보를 입력해 주세요.'), findsOneWidget);
     expect(find.bySemanticsLabel('프로필 사진 추가'), findsOneWidget);
@@ -278,10 +266,10 @@ void main() {
 
     await tester.tap(find.bySemanticsLabel('뒤로 가기'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('다음'));
+    await tester.tap(find.text('회원으로 시작하기'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(MemberProfileScreen), findsOneWidget);
+    expect(find.byType(BasicProfileScreen), findsOneWidget);
     expect(find.text('홍길동'), findsOneWidget);
     expect(find.text('01012345678'), findsOneWidget);
   });

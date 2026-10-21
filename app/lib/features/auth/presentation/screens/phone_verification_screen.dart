@@ -51,6 +51,7 @@ class _PhoneVerificationScreenState
   Widget build(BuildContext context) {
     final signupState = ref.watch(signupFlowViewModelProvider);
     final isBusy = signupState.verificationAction != VerificationAction.idle;
+    final verificationError = signupState.verificationFailure;
     final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
 
     return Scaffold(
@@ -107,9 +108,13 @@ class _PhoneVerificationScreenState
                         VerificationCodeInput(
                           key: _verificationInputKey,
                           controller: _codeController,
+                          errorText: verificationError?.message,
                           onCompleted: _hideKeyboard,
+                          onChanged: ref
+                              .read(signupFlowViewModelProvider.notifier)
+                              .updateVerificationCode,
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: verificationError == null ? 12 : 24),
                         SizedBox(
                           width: double.infinity,
                           height: 42,
@@ -230,19 +235,6 @@ class _PhoneVerificationScreenState
       return;
     }
     if (!isVerified) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              ref
-                      .read(signupFlowViewModelProvider)
-                      .verificationFailure
-                      ?.message ??
-                  '인증번호가 일치하지 않습니다.',
-            ),
-          ),
-        );
       return;
     }
 

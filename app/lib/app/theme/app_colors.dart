@@ -48,6 +48,7 @@ abstract final class AppColors {
   static const loginShadow = Color(0x1F000000);
 
   static const roleCardBackground = Color(0xFFF7F8F9);
+  static const selectionCardBackground = Color(0xFFF4F5F8);
   static const profilePhotoBackground = Color(0xFFCBD3DA);
   static const profileBadge = Color(0xFF113E30);
   static const inputBackground = Color(0xFFF0F1F4);

@@ -11,19 +11,27 @@ import 'package:swingmate/features/auth/presentation/widgets/onboarding_header.d
 import 'package:swingmate/features/auth/presentation/widgets/profile_field.dart';
 import 'package:swingmate/features/auth/presentation/widgets/profile_photo_placeholder.dart';
 
-/// Figma 302:17963 — 프로가 회원에게 자신을 소개하는 가입 화면입니다.
-class ProProfileScreen extends ConsumerStatefulWidget {
-  const ProProfileScreen({super.key});
+class BasicProfileScreen extends ConsumerStatefulWidget {
+  const BasicProfileScreen({required this.role, super.key});
+
+  final SignupRole role;
 
   @override
-  ConsumerState<ProProfileScreen> createState() => _ProProfileScreenState();
+  ConsumerState<BasicProfileScreen> createState() => _BasicProfileScreenState();
 }
 
-class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
+class _BasicProfileScreenState extends ConsumerState<BasicProfileScreen> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _requestButtonFocusNode = FocusNode();
   bool _phoneCompletionHandled = false;
+
+  bool get _isPro => widget.role == SignupRole.pro;
+
+  String get _title => _isPro ? '회원들에게 자신을\n소개해보세요.' : '프로에게 자신을\n소개해보세요.';
+
+  String get _description => _isPro
+      ? '프로필 사진과 기본 정보를 입력해 주세요.'
+      : '프로에게 나를 소개해 보세요.';
 
   @override
   void initState() {
@@ -37,7 +45,6 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
-    _requestButtonFocusNode.dispose();
     super.dispose();
   }
 
@@ -60,28 +67,23 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
                 OnboardingHeader(onBack: _goBack),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
-                      24,
-                      40,
-                      24,
-                      24 + keyboardHeight,
-                    ),
+                    padding: EdgeInsets.fromLTRB(24, 40, 24, 24 + keyboardHeight),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          '회원들에게 자신을\n소개해보세요.',
+                        Text(
+                          _title,
                           style: TextStyle(
                             color: AppColors.ink,
                             fontSize: 24,
                             fontWeight: FontWeight.w600,
-                            height: 36 / 24,
+                            height: _isPro ? 36 / 24 : 32 / 24,
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        const Text(
-                          '프로필 사진과 기본 정보를 입력해 주세요.',
-                          style: TextStyle(
+                        SizedBox(height: _isPro ? 6 : 8),
+                        Text(
+                          _description,
+                          style: const TextStyle(
                             color: AppColors.secondaryText,
                             fontSize: 18,
                             height: 28 / 18,
@@ -131,9 +133,7 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
                     width: double.infinity,
                     height: 48,
                     child: FilledButton(
-                      focusNode: _requestButtonFocusNode,
-                      onPressed:
-                          verificationAction == VerificationAction.sending
+                      onPressed: verificationAction == VerificationAction.sending
                           ? null
                           : _requestVerificationCode,
                       style: FilledButton.styleFrom(
@@ -178,15 +178,13 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
   }
 
   void _showPhotoComingSoon() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('프로필 사진 등록은 다음 단계에서 연결합니다.')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('프로필 사진 등록은 다음 단계에서 연결합니다.')),
+    );
   }
 
   void _handlePhoneChanged(String phoneNumber) {
-    ref
-        .read(signupFlowViewModelProvider.notifier)
-        .updatePhoneNumber(phoneNumber);
+    ref.read(signupFlowViewModelProvider.notifier).updatePhoneNumber(phoneNumber);
 
     if (phoneNumber.length < 11) {
       _phoneCompletionHandled = false;
@@ -196,9 +194,6 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
 
     _phoneCompletionHandled = true;
     FocusScope.of(context).unfocus();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _requestButtonFocusNode.requestFocus();
-    });
   }
 
   Future<void> _requestVerificationCode() async {
@@ -214,9 +209,7 @@ class _ProProfileScreenState extends ConsumerState<ProProfileScreen> {
     }
 
     final delivery = await signupViewModel.sendVerificationCode();
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
     if (delivery == null) {
       _showValidationMessage(
         ref.read(signupFlowViewModelProvider).verificationFailure?.message ??

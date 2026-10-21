@@ -20,8 +20,10 @@ abstract final class SignupRegistrationMapper {
   };
 
   static const _experiences = {
+    '아직 시작 전': GolfExperience.under6Months,
     '6개월 미만': GolfExperience.under6Months,
-    '6개월 ~ 3년': GolfExperience.months6To3Years,
+    '6개월 ~ 1년': GolfExperience.months6To3Years,
+    '1 ~ 3년': GolfExperience.months6To3Years,
     '3년 ~ 7년': GolfExperience.years3To7,
     '7년 이상': GolfExperience.over7Years,
   };

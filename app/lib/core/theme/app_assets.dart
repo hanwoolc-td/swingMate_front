@@ -14,6 +14,9 @@ abstract final class AppAssets {
   static const errorExclamation = 'assets/icons/error_exclamation.svg';
   static const onboardingMember = 'assets/icons/onboarding_member.svg';
   static const onboardingPro = 'assets/icons/onboarding_pro.svg';
+  static const roleMember = 'assets/icons/role_member.svg';
+  static const rolePro = 'assets/icons/role_pro.svg';
+  static const roleArrowRight = 'assets/icons/role_arrow_right.svg';
   static const profilePolygon1 = 'assets/icons/profile_polygon_1.svg';
   static const profilePolygon2 = 'assets/icons/profile_polygon_2.svg';
   static const profilePolygon3 = 'assets/icons/profile_polygon_3.svg';

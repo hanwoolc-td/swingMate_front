@@ -54,7 +54,7 @@ class _ProCodeConnectionScreenState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              '프로의 코드를\n입력해주세요.',
+                              '프로와 연결해보세요.',
                               style: TextStyle(
                                 color: AppColors.ink,
                                 fontSize: 24,
@@ -64,7 +64,7 @@ class _ProCodeConnectionScreenState
                             ),
                             const SizedBox(height: 8),
                             const Text(
-                              '레슨을 받고 싶은 프로에게 받은 코드를\n입력하세요.',
+                              '프로에게 받은 코드를 입력하거나\nQR을 스캔해주세요.',
                               style: TextStyle(
                                 color: AppColors.secondaryText,
                                 fontSize: 18,
