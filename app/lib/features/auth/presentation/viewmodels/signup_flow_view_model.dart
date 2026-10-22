@@ -28,12 +28,16 @@ class SignupFlowViewModel extends Notifier<SignupFlowState> {
     reset();
     state = state.copyWith(submissionAction: SubmissionAction.signingIn);
     try {
-      final token = await ref
+      final credential = await ref
           .read(socialCredentialSourceProvider)
-          .fetchToken(provider);
+          .fetchCredential(provider);
       final result = await ref
           .read(authRepositoryProvider)
-          .signInWithSocial(provider: provider, token: token);
+          .signInWithSocial(
+            provider: provider,
+            token: credential.token,
+            accountEmail: credential.email,
+          );
       state = state.copyWith(submissionAction: SubmissionAction.idle);
       return result;
     } catch (error) {

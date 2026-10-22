@@ -10,6 +10,7 @@ abstract interface class AuthRepository {
   Future<SocialSignInResult> signInWithSocial({
     required SocialProvider provider,
     required String token,
+    String? accountEmail,
   });
 
   Future<VerificationCodeDelivery> sendVerificationCode(String phoneNumber);

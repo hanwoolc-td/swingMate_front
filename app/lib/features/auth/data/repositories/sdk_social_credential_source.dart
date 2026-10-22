@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:swingmate/features/auth/domain/entities/auth_exception.dart';
+import 'package:swingmate/features/auth/domain/entities/social_credential.dart';
 import 'package:swingmate/features/auth/domain/entities/social_provider.dart';
 import 'package:swingmate/features/auth/domain/repositories/social_credential_source.dart';
 
@@ -11,14 +12,14 @@ class SdkSocialCredentialSource implements SocialCredentialSource {
   const SdkSocialCredentialSource();
 
   @override
-  Future<String> fetchToken(SocialProvider provider) async {
+  Future<SocialCredential> fetchCredential(SocialProvider provider) async {
     return switch (provider) {
-      SocialProvider.kakao => _kakaoAccessToken(),
-      SocialProvider.google => _googleIdToken(),
+      SocialProvider.kakao => _kakaoCredential(),
+      SocialProvider.google => _googleCredential(),
     };
   }
 
-  Future<String> _googleIdToken() async {
+  Future<SocialCredential> _googleCredential() async {
     try {
       final account = await GoogleSignIn.instance.authenticate();
       final idToken = account.authentication.idToken;
@@ -26,7 +27,7 @@ class SdkSocialCredentialSource implements SocialCredentialSource {
         debugPrint('Google 로그인 실패: ID 토큰이 비어 있음');
         throw const AuthException(AuthFailureReason.invalidSocialToken);
       }
-      return idToken;
+      return SocialCredential(token: idToken, email: account.email);
     } on GoogleSignInException catch (error) {
       debugPrint('Google 로그인 실패: ${error.code} ${error.description}');
       throw AuthException(switch (error.code) {
@@ -37,9 +38,16 @@ class SdkSocialCredentialSource implements SocialCredentialSource {
     }
   }
 
-  Future<String> _kakaoAccessToken() async {
+  Future<SocialCredential> _kakaoCredential() async {
     try {
-      return (await _loginWithKakaoTalkOrAccount()).accessToken;
+      final token = await _loginWithKakaoTalkOrAccount();
+      String? email;
+      try {
+        email = (await UserApi.instance.me()).kakaoAccount?.email;
+      } on KakaoException {
+        // 이메일 동의가 없거나 프로필 조회가 실패해도 토큰 로그인은 계속한다.
+      }
+      return SocialCredential(token: token.accessToken, email: email);
     } on KakaoClientException catch (error) {
       throw AuthException(
         error.reason == ClientErrorCause.cancelled

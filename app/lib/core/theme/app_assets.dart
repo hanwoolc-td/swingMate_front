@@ -1,5 +1,6 @@
 abstract final class AppAssets {
   static const golfCourseImage = 'assets/images/golf_course.png';
+  static const moreProfileSample = 'assets/images/more/profile_sample.png';
 
   static const loginApple = 'assets/icons/login_apple.png';
   static const loginGoogle = 'assets/icons/login_google.png';
@@ -60,4 +61,30 @@ abstract final class AppAssets {
   static const homeEmptyMoreHoriz = 'assets/icons/home_empty_more_horiz.svg';
 
   static const notificationEmpty = 'assets/icons/notification_empty.svg';
+
+  static const moreProfileChevron = 'assets/icons/more/profile_chevron.svg';
+  static const moreProQr = 'assets/icons/more/pro_qr.svg';
+  static const moreProPerson = 'assets/icons/more/pro_person.svg';
+  static const moreNotificationAudio =
+      'assets/icons/more/notification_audio.svg';
+  static const moreAccountSecurity = 'assets/icons/more/account_security.svg';
+  static const moreArticle = 'assets/icons/more/article.svg';
+  static const moreHelp = 'assets/icons/more/help.svg';
+  static const moreSupportAgent = 'assets/icons/more/support_agent.svg';
+  static const moreNavigationHoriz = 'assets/icons/more/more_horiz.svg';
+
+  static const accountSecurityGoogle = 'assets/icons/login_google.png';
+  static const accountSecurityKakao = 'assets/icons/login_kakao.svg';
+  static const accountSecurityBack =
+      'assets/icons/account_security/back_chevron.svg';
+  static const accountSecurityDevices =
+      'assets/icons/account_security/devices.svg';
+  static const accountSecurityLogout =
+      'assets/icons/account_security/logout.svg';
+  static const accountSecurityDelete =
+      'assets/icons/account_security/delete_account.svg';
+  static const accountSecurityArrow =
+      'assets/icons/account_security/arrow_right.svg';
+  static const accountSecurityMutedArrow =
+      'assets/icons/account_security/arrow_right_muted.svg';
 }

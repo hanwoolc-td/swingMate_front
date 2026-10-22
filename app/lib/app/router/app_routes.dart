@@ -47,6 +47,15 @@ abstract final class AppRoutes {
   static const homePath = '/';
   static const homeName = 'home';
 
+  static const morePath = '/more';
+  static const moreName = 'more';
+
+  static const accountSecurityPath = '/account-security';
+  static const accountSecurityName = 'account-security';
+
+  static const deviceSessionsPath = '/account-security/devices';
+  static const deviceSessionsName = 'device-sessions';
+
   static const notificationsPath = '/notifications';
   static const notificationsName = 'notifications';
 

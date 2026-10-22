@@ -6,6 +6,13 @@ class AuthSession {
   String? onboardingToken;
   String? accessToken;
   String? refreshToken;
+  String? socialProvider;
+  String? socialAccountEmail;
+
+  void setSocialIdentity({required String provider, String? email}) {
+    socialProvider = provider;
+    socialAccountEmail = email;
+  }
 
   /// 가입 완료 사용자는 액세스 토큰, 가입 중인 사용자는 온보딩 토큰을 쓴다.
   String? get bearerToken => accessToken ?? onboardingToken;
@@ -20,6 +27,14 @@ class AuthSession {
     accessToken = access;
     refreshToken = refresh;
     onboardingToken = null;
+  }
+
+  void clear() {
+    onboardingToken = null;
+    accessToken = null;
+    refreshToken = null;
+    socialProvider = null;
+    socialAccountEmail = null;
   }
 }
 

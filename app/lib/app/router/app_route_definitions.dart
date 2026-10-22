@@ -13,6 +13,9 @@ import 'package:swingmate/features/auth/presentation/screens/pro_career_screen.d
 import 'package:swingmate/features/auth/presentation/screens/pro_availability_screen.dart';
 import 'package:swingmate/features/auth/presentation/states/signup_flow_state.dart';
 import 'package:swingmate/features/home/presentation/screens/home_screen.dart';
+import 'package:swingmate/features/home/presentation/screens/more_screen.dart';
+import 'package:swingmate/features/home/presentation/screens/account_security_screen.dart';
+import 'package:swingmate/features/auth/presentation/screens/device_sessions_screen.dart';
 import 'package:swingmate/features/notification/presentation/screens/notification_screen.dart';
 import 'package:swingmate/features/setup/presentation/setup_page.dart';
 
@@ -86,6 +89,21 @@ abstract final class AppRouteDefinitions {
       path: AppRoutes.homePath,
       name: AppRoutes.homeName,
       builder: (context, state) => const HomeScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.morePath,
+      name: AppRoutes.moreName,
+      builder: (context, state) => const MoreScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.accountSecurityPath,
+      name: AppRoutes.accountSecurityName,
+      builder: (context, state) => const AccountSecurityScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.deviceSessionsPath,
+      name: AppRoutes.deviceSessionsName,
+      builder: (context, state) => const DeviceSessionsScreen(),
     ),
     GoRoute(
       path: AppRoutes.notificationsPath,

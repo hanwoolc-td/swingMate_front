@@ -1,4 +1,5 @@
 import 'package:swingmate/features/auth/domain/entities/social_provider.dart';
+import 'package:swingmate/features/auth/domain/entities/social_credential.dart';
 import 'package:swingmate/features/auth/domain/repositories/social_credential_source.dart';
 
 /// 개발용: 카카오·Google SDK 없이 임의의 토큰 문자열을 만든다.
@@ -13,7 +14,7 @@ class DevSocialCredentialSource implements SocialCredentialSource {
   );
 
   @override
-  Future<String> fetchToken(SocialProvider provider) async {
-    return '${provider.name}-$_devId';
+  Future<SocialCredential> fetchCredential(SocialProvider provider) async {
+    return SocialCredential(token: '${provider.name}-$_devId');
   }
 }

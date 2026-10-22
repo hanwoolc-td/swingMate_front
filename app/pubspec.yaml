@@ -60,7 +60,11 @@ flutter:
 
   assets:
     - assets/icons/
+    - assets/icons/more/
+    - assets/icons/account_security/
+    - assets/icons/device_sessions/
     - assets/images/
+    - assets/images/more/
 
   fonts:
     - family: Inter

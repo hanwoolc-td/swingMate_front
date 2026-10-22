@@ -26,6 +26,7 @@ class RemoteAuthRepository implements AuthRepository {
   Future<SocialSignInResult> signInWithSocial({
     required SocialProvider provider,
     required String token,
+    String? accountEmail,
   }) async {
     _clearVerification();
     final model = await _dataSource.socialLogin(
@@ -35,6 +36,7 @@ class RemoteAuthRepository implements AuthRepository {
       },
       token: token,
     );
+    _session.setSocialIdentity(provider: provider.name, email: accountEmail);
 
     if (model.isOnboardingCompleted) {
       _session.signIn(

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:swingmate/features/auth/data/models/auth_models.dart';
 import 'package:swingmate/features/auth/domain/entities/auth_exception.dart';
 
@@ -13,10 +14,11 @@ class AuthRemoteDataSource {
     required String provider,
     required String token,
   }) async {
+    final device = await _deviceDetails();
     final json = await _request(
       () => _dio.post<Map<String, dynamic>>(
         '/api/v1/auth/social/login',
-        data: {'provider': provider, 'idToken': token},
+        data: {'provider': provider, 'idToken': token, ...device},
       ),
     );
     return SocialLoginModel.fromJson(json);
@@ -62,10 +64,28 @@ class AuthRemoteDataSource {
     String path,
     Map<String, dynamic> body,
   ) async {
+    final device = await _deviceDetails();
     final json = await _request(
-      () => _dio.put<Map<String, dynamic>>(path, data: body),
+      () => _dio.put<Map<String, dynamic>>(path, data: {...body, ...device}),
     );
     return OnboardingResultModel.fromJson(json);
+  }
+
+  Future<Map<String, String?>> _deviceDetails() async {
+    try {
+      const channel = MethodChannel('swingmate/device_info');
+      final details = await channel.invokeMapMethod<String, String>('getDeviceInfo');
+      if (details != null) return details;
+    } on PlatformException {
+      // Login still works when platform metadata cannot be read.
+    } on MissingPluginException {
+      // Tests and unsupported platforms can omit device metadata.
+    }
+    return const {
+      'deviceName': 'SwingMate 모바일 기기',
+      'platform': 'UNKNOWN',
+      'appVersion': null,
+    };
   }
 
   /// 서버 오류 코드(`code`)를 [AuthException]으로 바꿔 Dio 예외가 위로 새지 않게 한다.

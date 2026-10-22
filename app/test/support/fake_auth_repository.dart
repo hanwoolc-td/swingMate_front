@@ -29,6 +29,7 @@ class FakeAuthRepository implements AuthRepository {
   int sendCallCount = 0;
   SocialProvider? signedInProvider;
   String? signedInToken;
+  String? signedInEmail;
   MemberRegistration? memberRegistration;
   ProRegistration? proRegistration;
 
@@ -36,10 +37,12 @@ class FakeAuthRepository implements AuthRepository {
   Future<SocialSignInResult> signInWithSocial({
     required SocialProvider provider,
     required String token,
+    String? accountEmail,
   }) async {
     _throwIfFailing();
     signedInProvider = provider;
     signedInToken = token;
+    signedInEmail = accountEmail;
     return signInResult;
   }
 

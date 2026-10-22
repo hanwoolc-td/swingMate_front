@@ -76,7 +76,7 @@ class _PhoneVerificationScreenState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          '휴대폰 번호를\n인증해주세요.',
+                          '휴대폰 번호를 인증해주세요.',
                           style: TextStyle(
                             color: AppColors.ink,
                             fontSize: 24,
@@ -235,6 +235,13 @@ class _PhoneVerificationScreenState
       return;
     }
     if (!isVerified) {
+      final failure = ref
+          .read(signupFlowViewModelProvider)
+          .verificationFailure;
+      if (failure == VerificationFailure.codeMismatch) {
+        _codeController.clear();
+        setState(() => _verificationInputKey = UniqueKey());
+      }
       return;
     }
 

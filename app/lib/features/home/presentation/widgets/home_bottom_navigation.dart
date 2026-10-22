@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:swingmate/app/router/app_routes.dart';
 import 'package:swingmate/app/theme/app_colors.dart';
 import 'package:swingmate/core/theme/app_assets.dart';
 
 class HomeBottomNavigation extends StatelessWidget {
-  const HomeBottomNavigation({super.key});
+  const HomeBottomNavigation({super.key, this.selectedIndex = 0});
+
+  final int selectedIndex;
 
   static const _items = [
     ('홈', AppAssets.homeEmptyHome),
     ('예약', AppAssets.homeEmptyToday),
     ('레슨권', AppAssets.homeEmptyConfirmationNumber),
-    ('더보기', AppAssets.homeEmptyMoreHoriz),
+    ('더보기', AppAssets.moreNavigationHoriz),
   ];
 
   @override
@@ -34,10 +38,16 @@ class HomeBottomNavigation extends StatelessWidget {
                     _BottomNavigationItem(
                       label: _items[index].$1,
                       icon: _items[index].$2,
-                      selected: index == 0,
-                      onTap: index == 0
-                          ? null
-                          : () => _showComingSoon(context, _items[index].$1),
+                      selected: index == selectedIndex,
+                      onTap: () {
+                        if (index == 0) {
+                          context.goNamed(AppRoutes.homeName);
+                        } else if (index == 3) {
+                          context.goNamed(AppRoutes.moreName);
+                        } else {
+                          _showComingSoon(context, _items[index].$1);
+                        }
+                      },
                     ),
                 ],
               ),
