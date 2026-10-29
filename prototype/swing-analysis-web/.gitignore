@@ -1,0 +1,5 @@
+# User-provided media and derived artifacts must not be committed.
+user-*.mp4
+pose-user-*.json
+labels-*.json
+*.golf.json

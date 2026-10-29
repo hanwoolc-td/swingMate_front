@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8777 --bind 127.0.0.1",
+    "test": "node coords.test.js && node annotation.test.js && node workflow-state.test.js && node edit-history.test.js && node viewport-transform.test.js && node analysis-guidance.test.js && node pose-track.test.js && node repeatability.test.js && node evidence.test.js && node metrics.test.js"
+  }
+}

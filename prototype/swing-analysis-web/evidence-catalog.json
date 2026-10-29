@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "EV-SR-01",
+      "topic": "golf-swing-kinematics",
+      "claim": "Golf kinematics research uses inconsistent methods, and 3D approaches are commonly required for joint rotation analysis; universal 2D normal ranges are not supported.",
+      "applicability": "Supports conservative interpretation of 2D body-pose observations. Does not validate this app's estimator or numeric thresholds.",
+      "source_type": "SYSTEMATIC_REVIEW",
+      "citation": {
+        "title": "Golf Swing Biomechanics: A Systematic Review and Methodological Recommendations for Kinematics",
+        "year": 2022,
+        "doi": "10.3390/sports10060091",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9227529/"
+      },
+      "status": "PINNED"
+    },
+    {
+      "id": "EV-MK-01",
+      "topic": "single-camera-markerless",
+      "claim": "A sagittal single-camera study found repeatability of forward tilt useful for proficiency analysis while club trajectory required a separate club-head detector.",
+      "applicability": "Limited to 2D observations under comparable capture conditions; it does not make wrist-center path a club path.",
+      "source_type": "PRIMARY_STUDY",
+      "citation": {
+        "title": "Extracting proficiency differences and individual characteristics in golfers' swing using single-video markerless motion analysis",
+        "year": 2023,
+        "doi": "10.3389/fspor.2023.1272038",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10684732/"
+      },
+      "status": "PINNED"
+    },
+    {
+      "id": "EV-SR-INJ-01",
+      "topic": "injury-risk",
+      "claim": "Evidence linking golf-swing biomechanics and lower-back pain is limited and heterogeneous.",
+      "applicability": "The app may surface observation candidates but must not diagnose injury risk from a single 2D video.",
+      "source_type": "SYSTEMATIC_REVIEW",
+      "citation": {
+        "title": "Biomechanical parameters of the golf swing associated with lower back pain: A systematic review",
+        "year": 2024,
+        "doi": "10.1080/02640414.2024.2319443",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/38446499/"
+      },
+      "status": "PINNED"
+    },
+    {
+      "id": "EV-TM-01",
+      "topic": "club-delivery",
+      "claim": "Club path, attack angle, speed, face angle and dynamic loft depend on three-dimensional club-head and impact-location measurements.",
+      "applicability": "These values must not be inferred from body pose or wrist-center path alone.",
+      "source_type": "MEASUREMENT_DEFINITION",
+      "citation": {
+        "title": "Tech insights: Club data definitions",
+        "year": 2017,
+        "doi": null,
+        "url": "https://www.trackman.com/blog/club-data-definitions"
+      },
+      "status": "PINNED"
+    }
+  ]
+}

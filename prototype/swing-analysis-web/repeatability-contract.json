@@ -1,0 +1,17 @@
+{
+  "contractVersion": 1,
+  "status": "development-defaults",
+  "minimumSwings": 3,
+  "recommendedSwings": 5,
+  "supportedDirections": ["FACE_ON", "DOWN_THE_LINE"],
+  "supportedClubs": ["7_IRON"],
+  "lowConfidenceEventPolicy": "EXCLUDE_SWING",
+  "overallScoreEnabled": false,
+  "storageMode": "LOCAL_ONLY",
+  "serverSharingEnabled": false,
+  "notes": [
+    "프로 코치 검증 전 임시 계약이다.",
+    "반복성 상태는 스윙 품질을 의미하지 않는다.",
+    "손 경로는 클럽헤드 경로가 아니다."
+  ]
+}
